@@ -1,27 +1,11 @@
-#include <iostream>
-#include <fstream>
-#include <algorithm> //sort
-#include <sstream>
-#include <string>
-#include <cstring> //memset
-#include <set>
-#include <cfloat> //DBL_MAX
+// Name     : dag.cpp
+// Author   : Geonmo Gu
+// Version  : 1.000
+// Copyright: Apache License 2.0
 
-using namespace std;
+#include "dag.h"
 
-void readDataGraph(string);
-void readQueryGraph(ifstream&, int);
-void buildDAG();
-void printDAG();
-void clearMemory();
-
-bool sortByDegreeData(int, int);
-bool sortByLabel(int, int);
-bool sortByDegreeQuery(int, int);
-bool sortByLabelFreqQuery(int, int);
-
-int binaryLowerBound(int, int, int);
-
+//Variables for data graph
 int numDataNode = 0;
 int numLabel = 0;
 int* labelData = NULL; //labelData[i] contains label of vertex i
@@ -31,6 +15,7 @@ int* idxSortedData = NULL; //idxSortedData[l] contains the last index in sortedD
 int* labelFrequency = NULL; //labelFrequency[l] contains the number of vertices having label l
 int* renamedLabel = NULL; //labels are renamed as consecutive numbers
 
+//Variables for query graph
 int root = -1;
 int numQueryNode = 0;
 int sumQueryDegree = 0;
@@ -39,10 +24,130 @@ int* degreeQuery = NULL;
 int* adjListQuery = NULL;
 int* adjIndexQuery = NULL;
 
+//Variables for query DAG
 int** dagChildQuery = NULL; //dagChildQuery[i]: children of node i
 int** dagParentQuery = NULL; //dagParentQuery[i]: parent of node i
 int* dagChildQuerySize = NULL; //dagChildQuerySize[i]: the number of children of node i
 int* dagParentQuerySize = NULL; //dagParentQuerySize[i]: the number of parent on node i
+
+
+void buildDAG()
+{
+//////////////////
+//allocate memory for dag data structure
+	if( dagChildQuery == NULL ) {
+		dagChildQuery = new int*[numQueryNode];
+		for(int i = 0; i < numQueryNode; ++i)
+			dagChildQuery[i] = NULL;
+	}
+	if( dagParentQuery == NULL ) {
+		dagParentQuery = new int*[numQueryNode];
+		for(int i = 0; i < numQueryNode; ++i)
+			dagParentQuery[i] = NULL;
+	}
+	if( dagChildQuerySize == NULL )
+		dagChildQuerySize = new int[numQueryNode];
+	if( dagParentQuerySize == NULL )
+		dagParentQuerySize = new int[numQueryNode];
+
+	memset(dagChildQuerySize, 0, sizeof(int) * numQueryNode);
+	memset(dagParentQuerySize, 0, sizeof(int) * numQueryNode);
+
+	for(int i = 0; i <numQueryNode; ++i) {
+		if( dagChildQuery[i] != NULL) {
+			delete[] dagChildQuery[i];
+			dagChildQuery[i] = NULL;
+		}
+		dagChildQuery[i] = new int[degreeQuery[i]];
+		
+		if( dagParentQuery[i] != NULL ) {
+			delete[] dagParentQuery[i];
+			dagParentQuery[i] = NULL;
+		}
+		dagParentQuery[i] = new int[degreeQuery[i]];
+	}
+//////////////////
+//construct dag data structure
+	char* popped = new char[numQueryNode];
+	memset(popped, 0, sizeof(char) * numQueryNode);
+	char* visited = new char[numQueryNode];
+	memset(visited, 0, sizeof(char) * numQueryNode);
+	int* queue = new int[numQueryNode];
+	int currQueueStart = 0;
+	int currQueueEnd = 1;
+	int nextQueueStart = 1;
+	int nextQueueEnd = 1;
+
+	//visit root
+	root = selectRoot();
+	visited[ root ] = 1;
+	queue[0] = root;
+
+	//BFS traversal using queue
+	while(true) {
+		stable_sort(queue + currQueueStart, queue + currQueueEnd, sortByDegreeQuery);
+		stable_sort(queue + currQueueStart, queue + currQueueEnd, sortByLabelFreqQuery);
+		while( currQueueStart != currQueueEnd ) {
+			int currNode = queue[ currQueueStart ];
+			++currQueueStart;
+			popped[currNode] = 1;
+			for(int i = adjIndexQuery[currNode]; i < adjIndexQuery[currNode + 1]; ++i) {
+				int childNode = adjListQuery[i];
+				if(popped[childNode] == 0) {
+					dagChildQuery[currNode][ dagChildQuerySize[currNode] ] = childNode;
+					dagParentQuery[childNode][ dagParentQuerySize[childNode] ] = currNode;
+
+					++dagChildQuerySize[currNode];
+					++dagParentQuerySize[childNode];
+				}
+				if(visited[childNode] == 0) {
+					visited[childNode] = 1;
+					queue[nextQueueEnd] = childNode;
+					++nextQueueEnd;
+				}
+			}
+		}
+
+		if(currQueueEnd == nextQueueEnd) //no nodes have been pushed in
+			break;
+
+		currQueueStart = currQueueEnd;
+		currQueueEnd = nextQueueEnd;
+	}
+	delete[] popped;
+	delete[] visited;
+	delete[] queue;
+}
+
+void printDAG()
+{
+	int* queue = new int[numQueryNode];
+	char* visited = new char[numQueryNode];
+	memset(visited, 0, sizeof(char) * numQueryNode);
+
+	queue[0] = root;
+	visited[root] = 1;
+	int queueStart = 0;
+	int queueEnd = 1;
+
+	while( queueStart != queueEnd ) {
+		int currNode = queue[queueStart];
+		++queueStart;
+
+		cout << currNode << " ";
+		for(int i = 0; i < dagChildQuerySize[currNode]; ++i) {
+			if(visited[ dagChildQuery[currNode][i] ] == 0) {
+				visited[ dagChildQuery[currNode][i] ] = 1;
+				queue[queueEnd] = dagChildQuery[currNode][i];
+				++queueEnd;
+			}
+		}
+	}
+	cout << endl;
+
+	delete[] visited;
+	delete[] queue;
+}
 
 void readDataGraph(string aFileName)
 {
@@ -162,7 +267,7 @@ void readDataGraph(string aFileName)
 	for(int i = 0; i < numDataNode; ++i)
 		sortedData[i] = i;
 
-	sort(sortedData, sortedData + numDataNode, sortByDegreeData);
+	stable_sort(sortedData, sortedData + numDataNode, sortByDegreeData);
 	stable_sort(sortedData, sortedData + numDataNode, sortByLabel);
 
 	if( idxSortedData != NULL ) {
@@ -296,124 +401,6 @@ int binaryLowerBound(int aLeft, int aRight, int aDegree)
 	return left;
 }
 
-void buildDAG()
-{
-//////////////////
-//allocate memory for dag data structure
-	if( dagChildQuery == NULL ) {
-		dagChildQuery = new int*[numQueryNode];
-		for(int i = 0; i < numQueryNode; ++i)
-			dagChildQuery[i] = NULL;
-	}
-	if( dagParentQuery == NULL ) {
-		dagParentQuery = new int*[numQueryNode];
-		for(int i = 0; i < numQueryNode; ++i)
-			dagParentQuery[i] = NULL;
-	}
-	if( dagChildQuerySize == NULL )
-		dagChildQuerySize = new int[numQueryNode];
-	if( dagParentQuerySize == NULL )
-		dagParentQuerySize = new int[numQueryNode];
-
-	memset(dagChildQuerySize, 0, sizeof(int) * numQueryNode);
-	memset(dagParentQuerySize, 0, sizeof(int) * numQueryNode);
-
-	for(int i = 0; i <numQueryNode; ++i) {
-		if( dagChildQuery[i] != NULL) {
-			delete[] dagChildQuery[i];
-			dagChildQuery[i] = NULL;
-		}
-		dagChildQuery[i] = new int[degreeQuery[i]];
-		
-		if( dagParentQuery[i] != NULL ) {
-			delete[] dagParentQuery[i];
-			dagParentQuery[i] = NULL;
-		}
-		dagParentQuery[i] = new int[degreeQuery[i]];
-	}
-//////////////////
-//construct dag data structure
-	char* popped = new char[numQueryNode];
-	memset(popped, 0, sizeof(char) * numQueryNode);
-	char* visited = new char[numQueryNode];
-	memset(visited, 0, sizeof(char) * numQueryNode);
-	int* queue = new int[numQueryNode];
-	int currQueueStart = 0;
-	int currQueueEnd = 1;
-	int nextQueueStart = 1;
-	int nextQueueEnd = 1;
-
-	//visit root
-	root = selectRoot();
-	visited[ root ] = 1;
-	queue[0] = root;
-
-	//BFS traversal using queue
-	while(true) {
-		sort(queue + currQueueStart, queue + currQueueEnd, sortByDegreeQuery);
-		stable_sort(queue + currQueueStart, queue + currQueueEnd, sortByLabelFreqQuery);
-		while( currQueueStart != currQueueEnd ) {
-			int currNode = queue[ currQueueStart ];
-			++currQueueStart;
-			popped[currNode] = 1;
-			for(int i = adjIndexQuery[currNode]; i < adjIndexQuery[currNode + 1]; ++i) {
-				int childNode = adjListQuery[i];
-				if(popped[childNode] == 0) {
-					dagChildQuery[currNode][ dagChildQuerySize[currNode] ] = childNode;
-					dagParentQuery[childNode][ dagParentQuerySize[childNode] ] = currNode;
-
-					++dagChildQuerySize[currNode];
-					++dagParentQuerySize[childNode];
-				}
-				if(visited[childNode] == 0) {
-					visited[childNode] = 1;
-					queue[nextQueueEnd] = childNode;
-					++nextQueueEnd;
-				}
-			}
-		}
-
-		if(currQueueEnd == nextQueueEnd) //no nodes have been pushed in
-			break;
-
-		currQueueStart = currQueueEnd;
-		currQueueEnd = nextQueueEnd;
-	}
-	delete[] popped;
-	delete[] visited;
-	delete[] queue;
-}
-
-void printDAG()
-{
-	int* queue = new int[numQueryNode];
-	char* visited = new char[numQueryNode];
-	memset(visited, 0, sizeof(char) * numQueryNode);
-
-	queue[0] = root;
-	visited[root] = 1;
-	int queueStart = 0;
-	int queueEnd = 1;
-
-	while( queueStart != queueEnd ) {
-		int currNode = queue[queueStart];
-		++queueStart;
-
-		cout << currNode << " ";
-		for(int i = 0; i < dagChildQuerySize[currNode]; ++i) {
-			if(visited[ dagChildQuery[currNode][i] ] == 0) {
-				visited[ dagChildQuery[currNode][i] ] = 1;
-				queue[queueEnd] = dagChildQuery[currNode][i];
-				++queueEnd;
-			}
-		}
-	}
-	cout << endl;
-
-	delete[] visited;
-	delete[] queue;
-}
-
 void clearMemory()
 {
 	if(labelData != NULL)
@@ -454,38 +441,4 @@ void clearMemory()
 		}
 		delete[] dagParentQuery;
 	}
-}
-
-//Usage: ./program dataGraph queryGraph numQuery
-int main(int argc, char *argv[]) {
-
-	if(argc != 4) {
-		cout << "Usage: ./program dataFile queryFile numQuery" << endl;
-		return -1;
-	}
-	cout << "Data File : " << argv[1] << endl;
-	cout << "Query file: " << argv[2] << endl;
-	cout << "Num Query: " << argv[3] << endl;
-
-	int numQuery = atoi(argv[3]);
-
-	readDataGraph(argv[1]);
-
-	ifstream queryFile(argv[2]);
-	for(int i = 0; i < numQuery; ++i) {
-		char tag;
-		int id;
-		int num;
-		int sumDegree;
-		queryFile >> tag >> id >> num >> sumDegree;
-		numQueryNode = num;
-
-		readQueryGraph(queryFile, sumDegree);
-		buildDAG();
-		printDAG();
-	}
-	queryFile.close();
-
-	clearMemory();
-	return 0;
 }
