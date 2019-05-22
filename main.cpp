@@ -34,7 +34,6 @@ int main(int argc, char *argv[])
 
         readQueryGraph(queryFile, sumDegree);
         buildDAG();
-        printDAG();
     }
     queryFile.close();
 

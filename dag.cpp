@@ -91,6 +91,8 @@ void buildDAG()
             int currNode = queue[ currQueueStart ];
             ++currQueueStart;
             popped[currNode] = 1;
+        	cout << currNode << " ";
+
             for(int i = adjIndexQuery[currNode]; i < adjIndexQuery[currNode + 1]; ++i) {
                 int childNode = adjListQuery[i];
                 if(popped[childNode] == 0) {
@@ -114,37 +116,8 @@ void buildDAG()
         currQueueStart = currQueueEnd;
         currQueueEnd = nextQueueEnd;
     }
-    delete[] popped;
-    delete[] visited;
-    delete[] queue;
-}
-
-void printDAG()
-{
-    int* queue = new int[numQueryNode];
-    char* visited = new char[numQueryNode];
-    memset(visited, 0, sizeof(char) * numQueryNode);
-
-    queue[0] = root;
-    visited[root] = 1;
-    int queueStart = 0;
-    int queueEnd = 1;
-
-    while( queueStart != queueEnd ) {
-        int currNode = queue[queueStart];
-        ++queueStart;
-
-        cout << currNode << " ";
-        for(int i = 0; i < dagChildQuerySize[currNode]; ++i) {
-            if(visited[ dagChildQuery[currNode][i] ] == 0) {
-                visited[ dagChildQuery[currNode][i] ] = 1;
-                queue[queueEnd] = dagChildQuery[currNode][i];
-                ++queueEnd;
-            }
-        }
-    }
     cout << endl;
-
+    delete[] popped;
     delete[] visited;
     delete[] queue;
 }
