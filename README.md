@@ -2,7 +2,7 @@
 Efficient Subgraph Matching: Harmonizing Dynamic Programming, Adaptive Matching Order, and Failing Set Together
 
 ## Compile
-To compile the dag construction program:
+To compile the query DAG construction program:
 - Linux: type `./compile.sh` or `g++ -std=c++11 main.cpp dag.cpp -o program`
 
 Binary file of DAF is available
@@ -11,7 +11,7 @@ Binary file of DAF is available
 
 ## Run
 
-To run the dag construction program:
+To run the query DAG construction program:
 ```
 Usage: ./program datagraphFile querygraphFile #queries > outputFile
 ```
