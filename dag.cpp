@@ -91,7 +91,7 @@ void buildDAG()
             int currNode = queue[ currQueueStart ];
             ++currQueueStart;
             popped[currNode] = 1;
-        	cout << currNode << " ";
+            cout << currNode << " ";
 
             for(int i = adjIndexQuery[currNode]; i < adjIndexQuery[currNode + 1]; ++i) {
                 int childNode = adjListQuery[i];
