@@ -1,3 +1,9 @@
+# Name     : sort_result.py
+# Author   : Geonmo Gu
+# Version  : 1.000
+# Copyright: Apache License 2.0
+
+
 import sys
 
 #Usage: python program.py file1 file2
