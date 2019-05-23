@@ -36,3 +36,13 @@ Examples:
 ./daf_1min -d human -q human_10n -a human_10n.dag -n 100
 ./daf_1min -d human -q human_10n -n 100
 ```
+
+## Compare Results
+
+To evaluate two results for a query set, use `sort_result.py` script as follows.
+
+```
+./daf_1min -d human -q human_10n -a human_10n.dag -n 100 > result1
+./daf_1min -d human -q human_10n -n 100 > result2
+python sort_result.py result1 result2
+```
