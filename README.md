@@ -5,7 +5,7 @@ Efficient Subgraph Matching: Harmonizing Dynamic Programming, Adaptive Matching 
 To compile the query DAG construction program:
 - Linux: type `./compile.sh` or `g++ -std=c++11 main.cpp dag.cpp -o program`
 
-Binary file of DAF is available
+Binary files of DAF is available
 - Linux: daf_1min
 - Windows: daf_1min.exe
 
