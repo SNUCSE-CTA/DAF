@@ -6,7 +6,7 @@
 #include "dag.h"
 
 //Variables for data graph
-//test
+//test3
 int numDataNode = 0;
 int numLabel = 0;
 int* labelData = NULL; //labelData[i] contains label of vertex i
