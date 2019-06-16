@@ -15,6 +15,11 @@ int main(int argc, char *argv[])
         cout << "Usage: ./program dataFile queryFile numQuery" << endl;
         return -1;
     }
+
+	// argv[1] : name of data graph file
+	// argv[2] : name of query graph file
+	// argv[3] : the number of query in query graph file
+
     //cout << "Data File : " << argv[1] << endl;
     //cout << "Query file: " << argv[2] << endl;
     //cout << "Num Query: " << argv[3] << endl;
