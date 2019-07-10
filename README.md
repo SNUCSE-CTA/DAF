@@ -7,6 +7,7 @@ Binary files of DAF are available for linux
 - daf_big_10min: DAF especially for large data graph such as twitter, which sets the same time limit as `daf_10min`
 - daf_parallel_unlimited: parallel version of DAF, which finds all embeddings without time limit.
 
+The maximum number of query vertices is set to 400 for all three binaries.
 ## Run
 ```
 Options:
@@ -42,16 +43,18 @@ id  search_time  total_time  #recursive_calls  #found_matches  (0:solved, 1:unso
 ```
 
 ```
-Example Result:
-0 0.093706 0.590738 92 15 0
-1 0.038522 0.322034 37 2 0
-2 0.074682 1.84184 82 2 0
-3 0.321389 0.708628 771 11 0
-4 0.035832 0.433856 49 2 0
-5 0.043896 0.296473 93 2 0
-6 0.035493 0.292103 70 2 0
-7 0.030768 0.277881 66 2 0
-8 0.037769 0.314199 51 7 0
-9 0.075046 0.400043 168 2 0
+Example Result: $ ../daf_10min -d ../yeast -q ../yeast_50n -n 10 -m 100000
+0 15.5061 16.6469 37313 100005 0
+1 0.052802 0.646388 38 302400 0
+2 0.080433 3.41642 82 101700 0
+3 1.89253 3.18895 1431 100100 0
+4 0.808205 2.20496 1596 103488 0
+5 4.8174 5.60534 8230 17640 0
+6 0.083195 0.7845 114 108864 0
+7 2.26529 3.03662 2309 100016 0
+8 1.34417 2.13961 285 100061 0
+9 2.24164 3.32384 721 100080 0
 ...
 ```
+
+The number of found matches can be larger than the argument due to NEC technique.
