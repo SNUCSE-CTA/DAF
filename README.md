@@ -4,7 +4,6 @@ Efficient Subgraph Matching: Harmonizing Dynamic Programming, Adaptive Matching 
 ## Binary Files
 Binary files of DAF are available for linux
 - daf_10min: DAF for subgraph matching, which sets time limit of 10 minutes for each query graph in a query set.
-- daf_big_10min: DAF especially for large data graph such as twitter, which sets the same time limit as `daf_10min`
 - daf_parallel_unlimited: parallel version of DAF, which finds all embeddings without time limit.
 
 The maximum number of query vertices is set to 400 for all three binaries.
@@ -43,7 +42,7 @@ id  search_time  total_time  #recursive_calls  #found_matches  (0:solved, 1:unso
 ```
 
 ```
-Example Result: $ daf_10min -d yeast -q yeast_50n -n 100 -m 100000
+Example Result: $ ./daf_10min -d yeast -q yeast_50n -n 100 -m 100000
 ...
 0 15.5061 16.6469 37313 100005 0
 1 0.052802 0.646388 38 302400 0
