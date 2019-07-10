@@ -6,7 +6,7 @@ Binary files of DAF are available for linux
 - daf_10min: DAF for subgraph matching, which sets time limit of 10 minutes for each query graph in a query set.
 - daf_parallel_unlimited: parallel version of DAF, which finds all embeddings without time limit.
 
-The maximum number of query vertices is set to 400 for all three binaries.
+The maximum number of query vertices is set to 400 for all the binary files.
 ## Run
 ```
 Options:
