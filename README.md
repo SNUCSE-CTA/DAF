@@ -43,7 +43,8 @@ id  search_time  total_time  #recursive_calls  #found_matches  (0:solved, 1:unso
 ```
 
 ```
-Example Result: $ ../daf_10min -d ../yeast -q ../yeast_50n -n 10 -m 100000
+Example Result: $ daf_10min -d yeast -q yeast_50n -n 100 -m 100000
+...
 0 15.5061 16.6469 37313 100005 0
 1 0.052802 0.646388 38 302400 0
 2 0.080433 3.41642 82 101700 0
