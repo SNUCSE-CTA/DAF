@@ -4,7 +4,7 @@ Efficient Subgraph Matching: Harmonizing Dynamic Programming, Adaptive Matching 
 ## Binary Files
 Binary files of DAF are available for linux
 - daf_10min: DAF for subgraph matching, which sets time limit of 10 minutes for each query graph in a query set.
-- daf_parallel_unlimited: parallel version of DAF, which finds all matches without time limit.
+- daf_parallel_10min: parallel version of DAF using openMP.
 
 The maximum number of query vertices is set to 400 for all the binary files.
 ## Run
@@ -17,7 +17,7 @@ Options:
 -p,   use path-size order. Path-size order is used by default.
 -c,   use candidate-size order.
 -f,   'not' using failing set. Failing set is used by default unless specified.
--h,   #threads (for daf_parallel_unlimited)
+-h,   #threads (for daf_parallel_10min)
 ```
 
 ```
@@ -27,7 +27,7 @@ Usages:
 ./daf_10min -d datagraphFile -q querygraphFile -n #queries -m #matches -c // candidate-size order and failing set are used
 ./daf_10min -d datagraphFile -q querygraphFile -n #queries -m #matches -c -f // candidate-size order is used, and failing set is not used.
 
-./daf_parallel_unlimited -d datagraphFile -q querygraphFile -n #queries -h 16 // find all matches using 16 threads
+./daf_parallel_10min -d datagraphFile -q querygraphFile -n #queries -m #matches // using 16 threads
 ```
 
 ```
@@ -37,7 +37,7 @@ Examples:
 ./daf_10min -d yeast -q yeast_50n -n 100 -m 100000 -c
 ./daf_10min -d yeast -q yeast_50n -n 100 -m 100000 -c -f
 
-./daf_parallel_unlimited -d human -q human_6n -n 100 -h 16
+./daf_parallel_10min -d yeast -q yeast_50n -n 100 -m 100000 -h 16
 ```
 
 ## Results
