@@ -2,9 +2,8 @@
 Efficient Subgraph Matching: Harmonizing Dynamic Programming, Adaptive Matching Order, and Failing Set Together
 
 ## Binary Files
-Binary files of DAF are available for linux
+Binary file of DAF are available for linux
 - daf_10min: DAF for subgraph matching, which sets time limit of 10 minutes for each query graph in a query set.
-- daf_parallel_10min: parallel version of DAF using openMP.
 
 The maximum number of query vertices is set to 400 for all the binary files.
 ## Run
