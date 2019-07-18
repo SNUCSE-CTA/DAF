@@ -5,7 +5,7 @@ Efficient Subgraph Matching: Harmonizing Dynamic Programming, Adaptive Matching 
 Binary file of DAF are available for linux
 - daf_10min: DAF for subgraph matching, which sets time limit of 10 minutes for each query graph in a query set.
 
-The maximum number of query vertices is set to 400 for all the binary files.
+The maximum number of query vertices is set to 400 for the binary file.
 ## Run
 ```
 Options:
@@ -16,7 +16,6 @@ Options:
 -p,   use path-size order. Path-size order is used by default.
 -c,   use candidate-size order.
 -f,   'not' using failing set. Failing set is used by default unless specified.
--h,   #threads (for daf_parallel_10min)
 ```
 
 ```
@@ -25,8 +24,6 @@ Usages:
 ./daf_10min -d datagraphFile -q querygraphFile -n #queries -m #matches -f // path-size order is used, and failing set is not used.
 ./daf_10min -d datagraphFile -q querygraphFile -n #queries -m #matches -c // candidate-size order and failing set are used
 ./daf_10min -d datagraphFile -q querygraphFile -n #queries -m #matches -c -f // candidate-size order is used, and failing set is not used.
-
-./daf_parallel_10min -d datagraphFile -q querygraphFile -n #queries -m #matches // using 16 threads
 ```
 
 ```
@@ -35,8 +32,6 @@ Examples:
 ./daf_10min -d yeast -q yeast_50n -n 100 -m 100000 -f
 ./daf_10min -d yeast -q yeast_50n -n 100 -m 100000 -c
 ./daf_10min -d yeast -q yeast_50n -n 100 -m 100000 -c -f
-
-./daf_parallel_10min -d yeast -q yeast_50n -n 100 -m 100000 -h 16
 ```
 
 ## Results
