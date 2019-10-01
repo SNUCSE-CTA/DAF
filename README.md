@@ -27,7 +27,7 @@ Usages:
 ./daf_10min -d datagraphFile -q querygraphFile -n #queries -m #matches -c // candidate-size order and failing set are used
 ./daf_10min -d datagraphFile -q querygraphFile -n #queries -m #matches -c -f // candidate-size order is used, and failing set is not used.
 
-./daf_parallel_10min -d datagraphFile -q querygraphFile -n #queries -m #matches -h 16 // using 16 threads
+./daf_parallel_10min -d datagraphFile -q querygraphFile -n #queries -m #matches -h #threads // using 16 threads
 ```
 
 ```
