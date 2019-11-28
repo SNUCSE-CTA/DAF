@@ -63,3 +63,13 @@ Example Result: $ ./daf_10min -d yeast -q yeast_50n -n 100 -m 100000
 ```
 
 The number of found matches can be larger than the argument due to NEC technique.
+
+## Automata Theory (2019-2)
+
+Example running is as follows. (centOS Linux)
+```
+chmod +x compile.sh
+chmod +x example_running.sh
+./compile.sh
+./example_running.sh
+```
