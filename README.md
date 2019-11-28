@@ -68,7 +68,10 @@ The number of found matches can be larger than the argument due to NEC technique
 
 Example running is as follows. (centOS Linux)
 ```
+git clone https://github.com/SNUCSE-CTA/DAF.git
+cd DAF
 chmod +x compile.sh
+chmod +x daf_2min
 chmod +x example_running.sh
 ./compile.sh
 ./example_running.sh
