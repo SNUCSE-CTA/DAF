@@ -3,8 +3,8 @@ echo -ne 'computing linear orders for 100 query graphs...'
 ./program yeast yeast_400n 100 > yeast_400n.dag
 echo 'done'
 
-#run daf using the computed dags
-echo -ne 'running DAF using the computed dags...'
+#run daf using the computed DAGs
+echo -ne 'running DAF using the computed DAGs...'
 ./daf_2min -d yeast -q yeast_400n -a yeast_400n.dag -n 100 -m 100000 > result_dag
 echo 'done'
 
