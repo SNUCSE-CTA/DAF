@@ -1,3 +1,10 @@
+# 오토마타 9조
+
+## 실행환경
+src 폴더 아래의 자바 클래스들을 모두 컴파일해서 hw3.java를 실행하면 됩니다.
+
+
+
 # DAF [SIGMOD 2019]
 Efficient Subgraph Matching: Harmonizing Dynamic Programming, Adaptive Matching Order, and Failing Set Together
 
