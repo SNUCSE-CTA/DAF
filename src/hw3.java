@@ -6,6 +6,8 @@ import java.util.Set;
 
 public class hw3{
 
+    int[] renamedLabels;//renamed label in data graph
+
 	public static void main(String[] args){
 
 			if(args.length!=3){
@@ -19,7 +21,7 @@ public class hw3{
 
 			ProcessIO pio = new ProcessIO(dataFileName, queryFileName, numQuery);
 
-			AdjacentList[] querySet = pio.readQuery();
+			//AdjacentList[] querySet = pio.readQuery();
 
 
 		
@@ -133,7 +135,7 @@ class ProcessIO{
 
             numOfLabel = lset.size();
             renameArray = new int[numOfLabel];              //index is renamed label, value is original label
-            Label[] larray = new Label[largestLabel + 1];   //tmp Label array, larray[i] contains a label of which original value is i
+            Graph.labels = new Label[largestLabel + 1];   //tmp Label array, larray[i] contains a label of which original value is i
             int[] varray = new int[dataGraph.numOfVertex];  //varray[vid] has label value of vertex vid
 
             //second read
@@ -161,14 +163,14 @@ class ProcessIO{
 
                         renameArray[labelRenameIndex] = labelValue;
 
-                        larray[labelValue] = new Label(labelValue);
-                        larray[labelValue].renamedLabel = labelRenameIndex;
-                        larray[labelValue].frequency++;
+                        Graph.labels[labelValue] = new Label(labelValue);
+                        Graph.labels[labelValue].renamedLabel = labelRenameIndex;
+                        Graph.labels[labelValue].frequency++;
 
                         labelRenameIndex++;
                     } else{
-                        larray[labelValue].renamedLabel = renameArray[labelValue];
-                        larray[labelValue].frequency++;
+                        Graph.labels[labelValue].renamedLabel = renameArray[labelValue];
+                        Graph.labels[labelValue].frequency++;
                     }
 
                 } else if(lineTag[0].equals("e")){
@@ -180,7 +182,7 @@ class ProcessIO{
             }
 
             for(int i=0;i<varray.length;i++){
-                dataGraph.vertices[i].label = larray[varray[i]];
+                dataGraph.vertices[i].label = Graph.labels[varray[i]];
             }
 
             dataGraph.renamedLabels = renameArray;
@@ -201,14 +203,17 @@ class ProcessIO{
      *      * v_i are the neighbors of the node
      *
      */
-    AdjacentList[] readQuery(){
-        AdjacentList[] querySet = new AdjacentList[numQuery];
+    Graph[] readQuery(){
+        Graph[] queryGraphs = new Graph[numQuery];
 
         String line;
         String[] graphTag;
         String[] vertexTag;
 
         int numOfVertices;
+        int degree;
+        int neighbor;
+        int labelValue;
 
         try{
             BufferedReader br = new BufferedReader(new FileReader(new File(queryFileName)));
@@ -216,29 +221,43 @@ class ProcessIO{
             //for each query
             for(int i=0;i<numQuery;i++){
                 line = br.readLine();
-
                 graphTag = line.split(" ");
+
                 numOfVertices = Integer.parseInt(graphTag[2]);
 
-                //for each vertices in one query graph
+                //one query graph
+                queryGraphs[i] = new Graph(numOfVertices);
+
+                //initialize vertices in a graph
+                for(int j =0;j<numOfVertices;j++){
+                    queryGraphs[i].vertices[j] = new Vertex(j);
+                }
+
+                //add neighbor vertices for each vertex
                 for(int j =0;j<numOfVertices;j++){
                     line = br.readLine();
                     vertexTag = line.split(" ");
 
+                    //get label of vertex
+                    labelValue = Integer.parseInt(vertexTag[1]);
+                    queryGraphs[i].vertices[j].label = Graph.labels[labelValue];
+
+                    //get degree of vertex
+                    degree = Integer.parseInt(vertexTag[2]);
+                    queryGraphs[i].vertices[j].degree = degree;
+
+                    //add neighbor vertices in each Vertex
+                    for(int k=0;k<degree;k++){
+                        neighbor = Integer.parseInt(vertexTag[3+k]);
+                        queryGraphs[i].vertices[j].neighborVertices.add(queryGraphs[i].vertices[neighbor]);
+                    }
                 }
-
             }
-
-
-
-
-            return querySet;
+            return queryGraphs;
         }catch (Exception e) {
             System.out.println(e);
             return null;
         }
-
-
     }
 
     //print all DAG string to console
@@ -279,20 +298,9 @@ class Graph{
     int numOfVertex;
     int[] renamedLabels;
     Vertex[] vertices;
+    static Label[] labels;
 
     Graph(int numOfVertex){
-        this.numOfVertex = numOfVertex;
-        vertices = new Vertex[numOfVertex];
-    }
-
-}
-
-class AdjacentList{
-
-    int numOfVertex;
-    Vertex vertices[];
-
-    AdjacentList(int numOfVertex){
         this.numOfVertex = numOfVertex;
         vertices = new Vertex[numOfVertex];
     }
@@ -302,8 +310,7 @@ class Vertex{
 
     private int id;
     Label label=null;
-    int degreeData=0;
-    int degreeQuery=0;
+    int degree =0;
     boolean visited = false;
     Set<Vertex> neighborVertices;
 
@@ -313,15 +320,13 @@ class Vertex{
     }
     public void addNeighbor(Vertex v){
         neighborVertices.add(v);
-        degreeData++;
+        degree++;
     }
-
     public boolean equals(Vertex v){
         return id==v.id;
     }
 
 }
-
 class Label{
 
     int renamedLabel;
@@ -331,14 +336,4 @@ class Label{
     Label(int originalLabel){
         this.originalLabel = originalLabel;
     }
-
-    @Override
-    public int hashCode() {
-        return originalLabel%524287;
-    }
-
-    public boolean equals(Label label){
-        return originalLabel==label.originalLabel;
-    }
-
 }
