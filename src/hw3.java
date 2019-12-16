@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.HashSet;
+import java.util.Set;
 
 public class hw3{
 
@@ -54,7 +56,114 @@ class ProcessIO{
     }
 
     //proto
-    void readDate(){}
+
+
+    /*
+     *
+     * Data graph format :
+     *  t [graph id] [number of vertices]
+     *  v [vertex id] [label of node]
+     *  e [vertex 1] [vertex 2] [label of edge]
+     *
+     * this method read only one date graph in this case.
+     *
+     */
+    AdjacentList readDate(){
+        AdjacentList dataGraph = new AdjacentList(1);//initialize for compile
+        String line;
+        String[] lineTag;
+        Set<Label> labelSet = new HashSet<>();
+
+        int[] originalLabels;
+        int[] renamedLabels;
+        int[] dataLabels;
+        int largestLabel = -1;
+
+        int vid, src, dst;
+        int labelRenameIndex = 0;
+        int numOfLabel = 0;
+
+        try{
+            BufferedReader br1 = new BufferedReader(new FileReader(new File(queryFileName)));
+            line = br1.readLine();
+
+            //for each query
+            while(line!=null){
+
+                lineTag = line.split(" ");
+
+                if(lineTag[0].equals("t")){
+
+                    dataGraph = new AdjacentList(Integer.parseInt(lineTag[2]));
+
+                } else if(lineTag[0].equals("v")){
+                    vid = Integer.parseInt(lineTag[1]);
+
+                    //add vertex in data graph
+                    Vertex v = new Vertex(vid);
+                    dataGraph.vertices[vid] = v;
+
+                    //add label in set
+                    int labelValue = Integer.parseInt(lineTag[2]);
+                    Label tmpLabel = new Label(labelValue);
+                    labelSet.add(tmpLabel);
+                    if(largestLabel<labelValue){
+                        largestLabel = labelValue;
+                    }
+
+                } else if(lineTag[0].equals("e")){
+                    //ignore label of edge in this case
+
+                    src = Integer.parseInt(lineTag[1]);
+                    dst = Integer.parseInt(lineTag[2]);
+
+                    dataGraph.vertices[src].addNeighbor(dataGraph.vertices[dst]);
+                    dataGraph.vertices[dst].addNeighbor(dataGraph.vertices[src]);
+
+                }else{
+                    //data graph input error
+                }
+                line = br1.readLine();
+            }
+            numOfLabel = labelSet.size();
+            Label[] labels = new Label[numOfLabel];
+
+            originalLabels = new int[largestLabel+1]; //data label
+            renamedLabels = new int[numOfLabel];
+            dataLabels = new int[dataGraph.numOfVertex];
+
+            BufferedReader br2 = new BufferedReader(new FileReader(new File(queryFileName)));
+            line = br2.readLine();
+
+            while(line!=null){
+                lineTag = line.split(" ");
+
+                if(lineTag[0].equals("t")){
+
+                } else if(lineTag[0].equals("v")){
+
+                    vid = Integer.parseInt(lineTag[1]);
+                    int labelValue = Integer.parseInt(lineTag[2]);
+
+                    //dataLabels[vid] =
+
+
+
+                } else if(lineTag[0].equals("e")){
+
+                }else{
+                    //data graph input error
+                }
+
+                line = br2.readLine();
+            }
+
+            return dataGraph;
+        }catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
 
 
     /*
@@ -143,16 +252,45 @@ class AdjacentList{
 }
 class Vertex{
 
-    Label label;
-    int degreeData;
-    int degreeQuery;
+    private int id;
+    Label label=null;
+    int degreeData=0;
+    int degreeQuery=0;
     boolean visited = false;
+    Set<Vertex> neighborVertices;
+
+    Vertex(int id){
+        this.id = id;
+        neighborVertices = new HashSet<>();
+    }
+    public void addNeighbor(Vertex v){
+        neighborVertices.add(v);
+        degreeData++;
+    }
+
+    public boolean equals(Vertex v){
+        return id==v.id;
+    }
 
 }
 
 class Label{
 
-    int labelNum;
+    int renamedLabel;
+    int originalLabel;
     int frequency = 0;
+
+    Label(int originalLabel){
+        this.originalLabel = originalLabel;
+    }
+
+    @Override
+    public int hashCode() {
+        return originalLabel%524287;
+    }
+
+    public boolean equals(Label label){
+        return originalLabel==label.originalLabel;
+    }
 
 }
