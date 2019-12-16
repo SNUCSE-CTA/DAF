@@ -68,22 +68,27 @@ class ProcessIO{
      * this method read only one date graph in this case.
      *
      */
-    AdjacentList readDate(){
-        AdjacentList dataGraph = new AdjacentList(1);//initialize for compile
+    Graph readDate(){
+        Graph dataGraph = new Graph(1);//initialize for compile
+
         String line;
         String[] lineTag;
-        Set<Label> labelSet = new HashSet<>();
 
-        int[] originalLabels;
-        int[] renamedLabels;
-        int[] dataLabels;
         int largestLabel = -1;
-
-        int vid, src, dst;
         int labelRenameIndex = 0;
-        int numOfLabel = 0;
+        int numOfLabel;
+        int[] renameArray;
+
+        //for temporary variable
+        int labelValue;
+        int vid, src, dst;
+        Set<Integer> lset = new HashSet<>();
 
         try{
+
+            //first read
+            //read number of vertices, number of labels and largest label
+            //also make adjacent list
             BufferedReader br1 = new BufferedReader(new FileReader(new File(queryFileName)));
             line = br1.readLine();
 
@@ -94,7 +99,7 @@ class ProcessIO{
 
                 if(lineTag[0].equals("t")){
 
-                    dataGraph = new AdjacentList(Integer.parseInt(lineTag[2]));
+                    dataGraph = new Graph(Integer.parseInt(lineTag[2]));
 
                 } else if(lineTag[0].equals("v")){
                     vid = Integer.parseInt(lineTag[1]);
@@ -104,9 +109,8 @@ class ProcessIO{
                     dataGraph.vertices[vid] = v;
 
                     //add label in set
-                    int labelValue = Integer.parseInt(lineTag[2]);
-                    Label tmpLabel = new Label(labelValue);
-                    labelSet.add(tmpLabel);
+                    labelValue = Integer.parseInt(lineTag[2]);
+                    lset.add(labelValue);
                     if(largestLabel<labelValue){
                         largestLabel = labelValue;
                     }
@@ -117,6 +121,7 @@ class ProcessIO{
                     src = Integer.parseInt(lineTag[1]);
                     dst = Integer.parseInt(lineTag[2]);
 
+                    //make adjacent list
                     dataGraph.vertices[src].addNeighbor(dataGraph.vertices[dst]);
                     dataGraph.vertices[dst].addNeighbor(dataGraph.vertices[src]);
 
@@ -125,15 +130,18 @@ class ProcessIO{
                 }
                 line = br1.readLine();
             }
-            numOfLabel = labelSet.size();
-            Label[] labels = new Label[numOfLabel];
 
-            originalLabels = new int[largestLabel+1]; //data label
-            renamedLabels = new int[numOfLabel];
-            dataLabels = new int[dataGraph.numOfVertex];
+            numOfLabel = lset.size();
+            renameArray = new int[numOfLabel];              //index is renamed label, value is original label
+            Label[] larray = new Label[largestLabel + 1];   //tmp Label array, larray[i] contains a label of which original value is i
+            int[] varray = new int[dataGraph.numOfVertex];  //varray[vid] has label value of vertex vid
 
+            //second read
+            //set label(new name, original name, frequency) on each vertex in data graph
+            //set renamed array in graph
             BufferedReader br2 = new BufferedReader(new FileReader(new File(queryFileName)));
             line = br2.readLine();
+            lset = new HashSet<>();
 
             while(line!=null){
                 lineTag = line.split(" ");
@@ -143,29 +151,46 @@ class ProcessIO{
                 } else if(lineTag[0].equals("v")){
 
                     vid = Integer.parseInt(lineTag[1]);
-                    int labelValue = Integer.parseInt(lineTag[2]);
+                    labelValue = Integer.parseInt(lineTag[2]);
 
-                    //dataLabels[vid] =
+                    varray[vid] = labelValue;
 
+                    if(!lset.contains(labelValue)){
 
+                        lset.add(labelValue);
+
+                        renameArray[labelRenameIndex] = labelValue;
+
+                        larray[labelValue] = new Label(labelValue);
+                        larray[labelValue].renamedLabel = labelRenameIndex;
+                        larray[labelValue].frequency++;
+
+                        labelRenameIndex++;
+                    } else{
+                        larray[labelValue].renamedLabel = renameArray[labelValue];
+                        larray[labelValue].frequency++;
+                    }
 
                 } else if(lineTag[0].equals("e")){
 
                 }else{
                     //data graph input error
                 }
-
                 line = br2.readLine();
             }
 
+            for(int i=0;i<varray.length;i++){
+                dataGraph.vertices[i].label = larray[varray[i]];
+            }
+
+            dataGraph.renamedLabels = renameArray;
             return dataGraph;
+
         }catch (Exception e) {
             System.out.println(e);
             return null;
         }
     }
-
-
     /*
      *
      * data format for query graph :
@@ -217,7 +242,16 @@ class ProcessIO{
     }
 
     //print all DAG string to console
-    void printAllDAGs(){}
+    void printAllDAGs(int[][] out){
+        String output="";
+        for(int i=0;i<out.length;i++){
+            for(int j=0;j<out[i].length-1;j++){
+                output+=out[i][j]+" ";
+            }
+            output+=out[i][out.length-1]+"\n";
+        }
+        System.out.print(output);
+    }
 
 }
 
@@ -239,6 +273,20 @@ class DAG{
     //int selectRoot(){}
 
 }
+
+class Graph{
+
+    int numOfVertex;
+    int[] renamedLabels;
+    Vertex[] vertices;
+
+    Graph(int numOfVertex){
+        this.numOfVertex = numOfVertex;
+        vertices = new Vertex[numOfVertex];
+    }
+
+}
+
 class AdjacentList{
 
     int numOfVertex;
