@@ -6,25 +6,27 @@ import java.util.Set;
 
 public class hw3{
 
-    int[] renamedLabels;//renamed label in data graph
-
 	public static void main(String[] args){
 
 			if(args.length!=3){
 				System.out.println("Usage: ./program dataFile queryFile numQuery");
 				return;
 			}
-
 			String dataFileName = args[0];
 			String queryFileName = args[1];
 			int numQuery = Integer.parseInt(args[2]);
 
+
 			ProcessIO pio = new ProcessIO(dataFileName, queryFileName, numQuery);
 
-			//AdjacentList[] querySet = pio.readQuery();
+			//read input
+			Graph dataGraph = pio.readData();
+			Graph[] queryGraphs = pio.readQuery();
 
+			//get DAG
 
-		
+            //print output
+			//pio.printAllDAGs(int[][]);
 	}
 
 }
@@ -57,10 +59,11 @@ class ProcessIO{
         this.numQuery = numQuery;
     }
 
-    //proto
-
-
     /*
+     *
+     * read Data Graph from given file : 'dataFileName'
+     * return Graph object
+     *
      *
      * Data graph format :
      *  t [graph id] [number of vertices]
@@ -70,7 +73,7 @@ class ProcessIO{
      * this method read only one date graph in this case.
      *
      */
-    Graph readDate(){
+    Graph readData(){
         Graph dataGraph = new Graph(1);//initialize for compile
 
         String line;
@@ -195,6 +198,10 @@ class ProcessIO{
     }
     /*
      *
+     * read query graphs from given file : 'queryFileName'
+     * return array of Graph object
+     *
+     *
      * data format for query graph :
      * - 100 graph instances
      * - in each graph :
@@ -273,12 +280,8 @@ class ProcessIO{
     }
 
 }
-
-
 /*
  * class for building Directed Acyclic Graph(DAG)
- *
- *
  *
  */
 class DAG{
@@ -293,6 +296,14 @@ class DAG{
 
 }
 
+/*
+ * class for representing undirected graph
+ *
+ * vertices[i] contains a vertex of which id is i
+ * labels[i] contains a Label object of which value is i
+ * labels is a static variable, it is stored in readData() in ProcessIO class
+ *
+ */
 class Graph{
 
     int numOfVertex;
