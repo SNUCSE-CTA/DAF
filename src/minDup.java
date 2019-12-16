@@ -14,6 +14,12 @@ class main{
             ad[u][degree[u]++] = v;
             ad[v][degree[v]++] = u;
         }
+
+        minDup md = new minDup();
+        int[] arr = new int[10];
+        arr = md.greedyLog(ad, degree, 10);
+        for(int i = 0; i < 10; i++)
+            System.out.println(arr[i]);
     }
 }
 
