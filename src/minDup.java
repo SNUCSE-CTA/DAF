@@ -1,7 +1,7 @@
 import java.util.*;
 import java.math.*;
 
-class main{
+class minDupMain{
     public static void main(String[] args){
         int[][] ad = new int[11][10];
         int[] degree = new int[11];
