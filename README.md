@@ -7,6 +7,8 @@ Binary files of DAF are available for linux
 - daf_twitter_10min: daf_10min for a large data graph
 - daf_parallel_10min: parallel version of DAF using openMP.
 - daf_parallel: parallel version of DAF without time limit.
+- daf_twitter: daf for a large data graph where the time limit can be given as an argument. 
+- daf_parallel_twitter: parallel version of DAF for a large data graph where the time limit can be given as an argument.
 
 The maximum number of query vertices is set to 400 for the binary file.
 ## Run
@@ -20,6 +22,7 @@ Options:
 -c,   use candidate-size order.
 -f,   'not' using failing set. Failing set is used by default unless specified.
 -h,   #threads (for daf_parallel_10min)
+-l,   specify the time limit in seconds (default: 600 seconds) (for daf_twitter and daf_parallel_twitter)
 ```
 
 ```
@@ -31,6 +34,9 @@ Usages:
 
 ./daf_parallel_10min -d datagraphFile -q querygraphFile -n #queries -m #matches -h #threads // using #threads
 ./daf_parallel -d datagraphFile -q querygraphFile -n #queries -m #matches -h #threads // without time limit
+
+./daf_twitter -d datagraphFile -q querygraphFile -n #queries -m #matches -l timeLimit 
+./daf_parallel_twitter -d datagraphFile -q querygraphFile -n #queries -m #matches -h #threads -l timeLimit 
 ```
 
 ```
