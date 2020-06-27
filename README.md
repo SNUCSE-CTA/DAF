@@ -73,3 +73,30 @@ Example Result: $ ./daf_10min -d yeast -q yeast_50n -n 100 -m 100000
 ```
 
 The number of found matches can be larger than the argument due to NEC technique.
+
+
+## Input File Format
+
+Data graph file format is a text format to store an undirected graph. 
+- The first line of the file should be "t ID #vertices"
+- Following lines of "v vertex-ID vertex-label" indicate the vertices in the graph.
+- The vertices should be written in the file in ascending order of their IDs, and a vertex ID should be in [0, #vertices - 1].
+- Following lines of "e vertex-ID1 vertex-ID2 edge-label" after the vertices indicate the undirected edges in the graph.
+
+For example:
+```
+Line "t 1 3112" means the start of a graph with ID=1 and #vertices=3112.
+Line "v 0 1" means there is a vertex with ID=0 and vertex-label=1 in the graph.
+Line "e 1 133 0" meas there is an undirected edge between vertices with IDs 1 and 133, where edge label is 0.
+```
+
+Query graph file format is a text format to store undirected graphs.
+- The first line of a graph should be "t ID #vertices #edges*2"
+- Each of the following lines indicates "vertex ID, label of the vertex, degree of the vertex, adjacent vertices"
+- The lines should be written in the file in ascending order of vertex IDs, and a vertex ID should be in [0, #vertices - 1].
+
+For example:
+```
+Line "t 0 50 156" means the start of a graph with ID=0, #vertices=50, and #edges*2=156.
+Line "1 6 5 0 2 3 6 11"  means v1 (vertex with ID=1) is labeled 6, and v0 is adjacent to five verteices; v0, v2, v3, v6, v11.
+```
