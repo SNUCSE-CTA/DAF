@@ -98,5 +98,5 @@ Query graph file format is a text format to store undirected graphs.
 For example:
 ```
 Line "t 0 50 156" means the start of a graph with ID=0, #vertices=50, and #edges*2=156.
-Line "1 6 5 0 2 3 6 11"  means v1 (vertex with ID=1) is labeled 6, and v0 is adjacent to five verteices; v0, v2, v3, v6, v11.
+Line "1 6 5 0 2 3 6 11"  means v1 (vertex with ID=1) is labeled 6, and v1 is adjacent to five verteices; v0, v2, v3, v6, v11.
 ```
