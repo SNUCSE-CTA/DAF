@@ -4,7 +4,6 @@ Efficient Subgraph Matching: Harmonizing Dynamic Programming, Adaptive Matching 
 ## Binary Files
 Binary files of DAF are available for linux
 - daf_10min: DAF for subgraph matching, which sets time limit of 10 minutes for each query graph in a query set.
-- daf_twitter_10min: daf_10min for a large data graph
 - daf_parallel_10min: parallel version of DAF using openMP.
 - daf_parallel: parallel version of DAF without time limit.
 - daf_twitter: daf for a large data graph where the time limit can be given as an argument. 
@@ -59,16 +58,16 @@ id  search_time  total_time  #recursive_calls  #found_matches  (0:solved, 1:unso
 ```
 Example Result: $ ./daf_10min -d yeast -q yeast_50n -n 100 -m 100000
 ...
-0 15.5061 16.6469 37313 100005 0
-1 0.052802 0.646388 38 302400 0
-2 0.080433 3.41642 82 101700 0
-3 1.89253 3.18895 1431 100100 0
-4 0.808205 2.20496 1596 103488 0
-5 4.8174 5.60534 8230 17640 0
-6 0.083195 0.7845 114 108864 0
-7 2.26529 3.03662 2309 100016 0
-8 1.34417 2.13961 285 100061 0
-9 2.24164 3.32384 721 100080 0
+0 7.44896 8.77313 37291 100005 0
+1 0.064376 0.772223 38 302400 0
+2 0.089444 4.262434 82 117180 0
+3 1.540991 3.151524 1431 100100 0
+4 0.473859 2.214693 1596 103488 0
+5 2.911612 3.834206 8230 17640 0
+6 0.063854 0.889809 114 108864 0
+7 1.486209 2.386487 2307 100040 0
+8 0.999605 1.942816 285 100061 0
+9 1.848989 3.129240 722 100080 0
 ...
 ```
 
@@ -87,7 +86,7 @@ For example:
 ```
 Line "t 1 3112" means the start of a graph with ID=1 and #vertices=3112.
 Line "v 0 1" means there is a vertex with ID=0 and vertex-label=1 in the graph.
-Line "e 1 133 0" meas there is an undirected edge between vertices with IDs 1 and 133, where edge label is 0.
+Line "e 1 133 0" means there is an undirected edge between vertices with IDs 1 and 133, where edge label is 0.
 ```
 
 Query graph file format is a text format to store undirected graphs.
