@@ -1,13 +1,3 @@
-/**
- * @file log.h
- * @author CTALAB
- * @brief log function macro
- * @version 0.1
- * @date 2021-03-29
- *
- * @copyright Copyright (c) 2021
- *
- */
 #ifndef GLOBAL_LOG_H_
 #define GLOBAL_LOG_H_
 

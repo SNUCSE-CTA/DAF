@@ -1,14 +1,3 @@
-/**
- * @file timer.h
- * @author your name (you@domain.com)
- * @brief
- * @version 0.1
- * @date 2021-07-28
- *
- * @copyright Copyright (c) 2021
- *
- */
-
 #ifndef GLOBAL_TIMER_H_
 #define GLOBAL_TIMER_H_
 
