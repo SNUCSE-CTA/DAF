@@ -55,7 +55,7 @@ inline Size Graph::GetNumLabels() const { return num_label_; }
 
 inline Size Graph::GetNumVertices() const { return num_vertex_; }
 
-inline Size Graph::GetNumEdges() const { /* code */ }
+inline Size Graph::GetNumEdges() const { return num_edge_; }
 
 inline Size Graph::GetMaxDegree() const { /* code */ }
 
