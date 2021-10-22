@@ -51,7 +51,7 @@ class Graph {
   Size* core_num_;
 };
 
-inline Size Graph::GetNumLabels() const { /* code */ }
+inline Size Graph::GetNumLabels() const { return num_label_; }
 
 inline Size Graph::GetNumVertices() const { /* code */ }
 
