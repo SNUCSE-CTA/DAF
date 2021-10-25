@@ -57,7 +57,7 @@ inline Size Graph::GetNumVertices() const { return num_vertex_; }
 
 inline Size Graph::GetNumEdges() const { return num_edge_; }
 
-inline Size Graph::GetMaxDegree() const { /* code */ }
+inline Size Graph::GetMaxDegree() const { return max_degree_; }
 
 inline Label Graph::GetLabel(Vertex v) const { /* code */ }
 
