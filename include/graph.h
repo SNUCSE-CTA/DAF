@@ -59,7 +59,7 @@ inline Size Graph::GetNumEdges() const { return num_edge_; }
 
 inline Size Graph::GetMaxDegree() const { return max_degree_; }
 
-inline Label Graph::GetLabel(Vertex v) const { /* code */ }
+inline Label Graph::GetLabel(Vertex v) const { return label_[v]; }
 
 inline Size Graph::GetStartOffset(Vertex v) const { /* code */ }
 
