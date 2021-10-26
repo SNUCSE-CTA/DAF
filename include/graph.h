@@ -65,7 +65,9 @@ inline Size Graph::GetStartOffset(Vertex v) const { return start_off_[v]; }
 
 inline Size Graph::GetEndOffset(Vertex v) const { return start_off_[v + 1]; }
 
-inline Size Graph::GetDegree(Vertex v) const { /* code */ }
+inline Size Graph::GetDegree(Vertex v) const {
+  return start_off_[v + 1] - start_off_[v];
+}
 
 inline Size Graph::GetCoreNum(Vertex v) const { /* code */ }
 
