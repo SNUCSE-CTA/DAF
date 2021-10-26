@@ -75,7 +75,7 @@ inline Label Graph::GetLabelFrequency(Label l) const {
   return label_frequency_[l];
 }
 
-inline Vertex Graph::GetNeighbor(Size i) const { /* code */ }
+inline Vertex Graph::GetNeighbor(Size i) const { return linear_adj_list_[i]; }
 
 }  // namespace daf
 
