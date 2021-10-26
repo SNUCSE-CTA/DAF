@@ -71,7 +71,9 @@ inline Size Graph::GetDegree(Vertex v) const {
 
 inline Size Graph::GetCoreNum(Vertex v) const { return core_num_[v]; }
 
-inline Label Graph::GetLabelFrequency(Label l) const { /* code */ }
+inline Label Graph::GetLabelFrequency(Label l) const {
+  return label_frequency_[l];
+}
 
 inline Vertex Graph::GetNeighbor(Size i) const { /* code */ }
 
