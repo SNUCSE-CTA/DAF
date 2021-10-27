@@ -55,5 +55,63 @@ void Graph::LoadRoughGraph(const std::string &filename,
   fin.close();
 }
 
-void Graph::computeCoreNum() { /* code */ }
+void Graph::computeCoreNum() {
+  Size *bin = new Size[max_degree_ + 1];
+  Size *pos = new Size[GetNumVertices()];
+  Vertex *vert = new Vertex[GetNumVertices()];
+
+  std::fill(bin, bin + (max_degree_ + 1), 0);
+
+  for (Vertex v = 0; v < GetNumVertices(); ++v) {
+    bin[core_num_[v]] += 1;
+  }
+
+  Size start = 0;
+  Size num;
+
+  for (Size d = 0; d <= max_degree_; ++d) {
+    num = bin[d];
+    bin[d] = start;
+    start += num;
+  }
+
+  for (Vertex v = 0; v < GetNumVertices(); ++v) {
+    pos[v] = bin[core_num_[v]];
+    vert[pos[v]] = v;
+    bin[core_num_[v]] += 1;
+  }
+
+  for (Size d = max_degree_; d > 0; --d) bin[d] = bin[d - 1];
+  bin[0] = 0;
+
+  for (Size i = 0; i < GetNumVertices(); ++i) {
+    Vertex v = vert[i];
+
+    for (Size j = GetStartOffset(v); j < GetEndOffset(v); j++) {
+      Vertex u = GetNeighbor(j);
+
+      if (core_num_[u] > core_num_[v]) {
+        Size du = core_num_[u];
+        Size pu = pos[u];
+
+        Size pw = bin[du];
+        Vertex w = vert[pw];
+
+        if (u != w) {
+          pos[u] = pw;
+          pos[w] = pu;
+          vert[pu] = w;
+          vert[pw] = u;
+        }
+
+        bin[du]++;
+        core_num_[u]--;
+      }
+    }
+  }
+
+  delete[] bin;
+  delete[] pos;
+  delete[] vert;
+}
 }  // namespace daf
