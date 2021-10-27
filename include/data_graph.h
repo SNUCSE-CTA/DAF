@@ -55,7 +55,9 @@ class DataGraph : public Graph {
   Size max_label_frequency_;
 };
 
-inline Size DataGraph::GetStartOffset(Vertex v, Label l) const { /* code */ }
+inline Size DataGraph::GetStartOffset(Vertex v, Label l) const {
+  return adj_offs_by_label_[v * GetNumLabels() + l].first;
+}
 
 inline Size DataGraph::GetEndOffset(Vertex v, Label l) const { /* code */ }
 
