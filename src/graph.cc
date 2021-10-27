@@ -4,7 +4,7 @@
 #include <iostream>
 
 namespace daf {
-Graph::Graph() { /* code */ }
+Graph::Graph() {}
 
 Graph::~Graph() { /* code */ }
 
