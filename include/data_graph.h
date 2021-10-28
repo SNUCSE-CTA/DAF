@@ -59,7 +59,9 @@ inline Size DataGraph::GetStartOffset(Vertex v, Label l) const {
   return adj_offs_by_label_[v * GetNumLabels() + l].first;
 }
 
-inline Size DataGraph::GetEndOffset(Vertex v, Label l) const { /* code */ }
+inline Size DataGraph::GetEndOffset(Vertex v, Label l) const {
+  return adj_offs_by_label_[v * GetNumLabels() + l].second;
+}
 
 inline Size DataGraph::GetNeighborLabelFrequency(Vertex v, Label l) const { /* code */ }
 
