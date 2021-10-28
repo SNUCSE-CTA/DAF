@@ -68,7 +68,9 @@ inline Size DataGraph::GetNeighborLabelFrequency(Vertex v, Label l) const {
   return offs.second - offs.first;
 }
 
-inline Label DataGraph::GetTransferredLabel(Label l) const { /* code */ }
+inline Label DataGraph::GetTransferredLabel(Label l) const {
+  return transferred_label_[l];
+}
 
 inline Size DataGraph::GetStartOffsetByLabel(Label l) const { /* code */ }
 
