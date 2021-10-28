@@ -72,7 +72,9 @@ inline Label DataGraph::GetTransferredLabel(Label l) const {
   return transferred_label_[l];
 }
 
-inline Size DataGraph::GetStartOffsetByLabel(Label l) const { /* code */ }
+inline Size DataGraph::GetStartOffsetByLabel(Label l) const {
+  return offs_by_label_[l];
+}
 
 inline Size DataGraph::GetEndOffsetByLabel(Label l) const { /* code */ }
 
