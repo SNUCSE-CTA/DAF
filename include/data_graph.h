@@ -80,7 +80,9 @@ inline Size DataGraph::GetEndOffsetByLabel(Label l) const {
   return offs_by_label_[l + 1];
 }
 
-inline Size DataGraph::GetVertexBySortedLabelOffset(Size i) const { /* code */ }
+inline Size DataGraph::GetVertexBySortedLabelOffset(Size i) const {
+  return vertices_sorted_[i];
+}
 
 inline Size DataGraph::GetNbrBitsetSize() const { /* code */ }
 
