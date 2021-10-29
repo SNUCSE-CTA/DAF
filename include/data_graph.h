@@ -76,7 +76,9 @@ inline Size DataGraph::GetStartOffsetByLabel(Label l) const {
   return offs_by_label_[l];
 }
 
-inline Size DataGraph::GetEndOffsetByLabel(Label l) const { /* code */ }
+inline Size DataGraph::GetEndOffsetByLabel(Label l) const {
+  return offs_by_label_[l + 1];
+}
 
 inline Size DataGraph::GetVertexBySortedLabelOffset(Size i) const { /* code */ }
 
