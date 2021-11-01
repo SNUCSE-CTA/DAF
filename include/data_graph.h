@@ -94,7 +94,14 @@ inline Size DataGraph::GetMaxLabelFrequency() const {
   return max_label_frequency_;
 }
 
-inline Size DataGraph::GetInitCandSize(Label l, Size d) const { /* code */ }
+inline Size DataGraph::GetInitCandSize(Label l, Size d) const {
+  Size s = GetStartOffsetByLabel(l);
+  Size e = GetEndOffsetByLabel(l);
+  auto pos = std::lower_bound(
+      vertices_sorted_ + s, vertices_sorted_ + e, d,
+      [this](Vertex v, Size d) -> bool { return GetDegree(v) >= d; });
+  return pos - (vertices_sorted_ + s);
+}
 
 inline bool DataGraph::CheckAllNbrLabelExist(Vertex v,
                                              uint64_t* nbr_bitset) const { /* code */ }
