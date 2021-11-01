@@ -104,6 +104,13 @@ inline Size DataGraph::GetInitCandSize(Label l, Size d) const {
 }
 
 inline bool DataGraph::CheckAllNbrLabelExist(Vertex v,
-                                             uint64_t* nbr_bitset) const { /* code */ }
+                                             uint64_t* nbr_bitset) const {
+  for (Size i = 0; i < GetNbrBitsetSize(); ++i) {
+    if ((linear_nbr_bitset_[v * GetNbrBitsetSize() + i] | nbr_bitset[i]) !=
+        linear_nbr_bitset_[v * GetNbrBitsetSize() + i])
+      return false;
+  }
+  return true;
+}
 }  // namespace daf
 #endif  // DATA_GRAPH_H_
