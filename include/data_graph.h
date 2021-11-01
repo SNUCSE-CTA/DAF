@@ -86,7 +86,9 @@ inline Size DataGraph::GetVertexBySortedLabelOffset(Size i) const {
 
 inline Size DataGraph::GetNbrBitsetSize() const { return nbr_bitset_size_; }
 
-inline Size DataGraph::GetMaxNbrDegree(Vertex v) const { /* code */ }
+inline Size DataGraph::GetMaxNbrDegree(Vertex v) const {
+  return max_nbr_degree_[v];
+}
 
 inline Size DataGraph::GetMaxLabelFrequency() const { /* code */ }
 
