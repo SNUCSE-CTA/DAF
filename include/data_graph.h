@@ -90,7 +90,9 @@ inline Size DataGraph::GetMaxNbrDegree(Vertex v) const {
   return max_nbr_degree_[v];
 }
 
-inline Size DataGraph::GetMaxLabelFrequency() const { /* code */ }
+inline Size DataGraph::GetMaxLabelFrequency() const {
+  return max_label_frequency_;
+}
 
 inline Size DataGraph::GetInitCandSize(Label l, Size d) const { /* code */ }
 
