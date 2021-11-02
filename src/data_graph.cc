@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace daf {
-DataGraph::DataGraph() { /* code */ }
+DataGraph::DataGraph() {}
 
 DataGraph::~DataGraph() { /* code */ }
 
