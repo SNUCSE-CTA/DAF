@@ -58,7 +58,9 @@ struct NECElement {
   Size represent_idx;
 };
 
-inline bool QueryGraph::IsNECRepresentation(Vertex v) const { /* code */ }
+inline bool QueryGraph::IsNECRepresentation(Vertex v) const {
+  return NEC_map_[v] == v;
+}
 
 inline bool QueryGraph::IsInNEC(Vertex v) const { /* code */ }
 
