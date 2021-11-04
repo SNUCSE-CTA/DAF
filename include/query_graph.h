@@ -66,7 +66,9 @@ inline bool QueryGraph::IsInNEC(Vertex v) const { return NEC_map_[v] >= 0; }
 
 inline Size QueryGraph::GetNumNECLabel() const { return num_NEC_label_; }
 
-inline Size QueryGraph::GetNECStartOffset(Size i) const { /* code */ }
+inline Size QueryGraph::GetNECStartOffset(Size i) const {
+  return NEC_start_offs_[i];
+}
 
 inline Size QueryGraph::GetNECEndOffset(Size i) const { /* code */ }
 
