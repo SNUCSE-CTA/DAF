@@ -62,7 +62,7 @@ inline bool QueryGraph::IsNECRepresentation(Vertex v) const {
   return NEC_map_[v] == v;
 }
 
-inline bool QueryGraph::IsInNEC(Vertex v) const { /* code */ }
+inline bool QueryGraph::IsInNEC(Vertex v) const { return NEC_map_[v] >= 0; }
 
 inline Size QueryGraph::GetNumNECLabel() const { /* code */ }
 
