@@ -70,7 +70,9 @@ inline Size QueryGraph::GetNECStartOffset(Size i) const {
   return NEC_start_offs_[i];
 }
 
-inline Size QueryGraph::GetNECEndOffset(Size i) const { /* code */ }
+inline Size QueryGraph::GetNECEndOffset(Size i) const {
+  return NEC_start_offs_[i + 1];
+}
 
 inline const NECElement &QueryGraph::GetNECElement(Size i) const { /* code */ }
 
