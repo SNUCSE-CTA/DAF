@@ -84,7 +84,7 @@ inline Size QueryGraph::GetNumNonLeafVertices() const {
   return num_non_leaf_vertices_;
 }
 
-inline Size QueryGraph::GetNECSize(Vertex v) const { /* code */ }
+inline Size QueryGraph::GetNECSize(Vertex v) const { return NEC_size_[v]; }
 
 inline Size QueryGraph::GetNECRepresentative(Vertex v) const { /* code */ }
 
