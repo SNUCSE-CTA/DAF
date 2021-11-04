@@ -78,7 +78,7 @@ inline const NECElement &QueryGraph::GetNECElement(Size i) const {
   return NEC_elems_[i];
 }
 
-inline bool QueryGraph::IsTree() const { /* code */ }
+inline bool QueryGraph::IsTree() const { return is_tree_; }
 
 inline Size QueryGraph::GetNumNonLeafVertices() const { /* code */ }
 
