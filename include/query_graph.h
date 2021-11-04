@@ -74,7 +74,9 @@ inline Size QueryGraph::GetNECEndOffset(Size i) const {
   return NEC_start_offs_[i + 1];
 }
 
-inline const NECElement &QueryGraph::GetNECElement(Size i) const { /* code */ }
+inline const NECElement &QueryGraph::GetNECElement(Size i) const {
+  return NEC_elems_[i];
+}
 
 inline bool QueryGraph::IsTree() const { /* code */ }
 
