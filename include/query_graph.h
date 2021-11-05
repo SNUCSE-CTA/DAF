@@ -86,7 +86,13 @@ inline Size QueryGraph::GetNumNonLeafVertices() const {
 
 inline Size QueryGraph::GetNECSize(Vertex v) const { return NEC_size_[v]; }
 
-inline Size QueryGraph::GetNECRepresentative(Vertex v) const { /* code */ }
+inline Size QueryGraph::GetNECRepresentative(Vertex v) const {
+  if (IsInNEC(v)) {
+    return NEC_map_[v];
+  } else {
+    return v;
+  }
+}
 
 inline Label QueryGraph::GetMaxLabel() const { /* code */ }
 }  // namespace daf
