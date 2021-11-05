@@ -94,7 +94,7 @@ inline Size QueryGraph::GetNECRepresentative(Vertex v) const {
   }
 }
 
-inline Label QueryGraph::GetMaxLabel() const { /* code */ }
+inline Label QueryGraph::GetMaxLabel() const { return max_label_; }
 }  // namespace daf
 
 #endif  // QUERY_GRAPH_H_
