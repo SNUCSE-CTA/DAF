@@ -6,7 +6,7 @@
 #include <vector>
 
 namespace daf {
-QueryGraph::QueryGraph() { /* code */ }
+QueryGraph::QueryGraph() {}
 QueryGraph::~QueryGraph() { /* code */ }
 
 bool QueryGraph::LoadAndProcessGraph(const std::string &filename,
