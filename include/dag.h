@@ -38,7 +38,7 @@ class DAG {
   Vertex SelectRootVertex();
 };
 
-inline Vertex DAG::GetRoot() const { /* code */ }
+inline Vertex DAG::GetRoot() const { return bfs_sequence_[0]; }
 inline Size DAG::GetNumChildren(Vertex v) const { /* code */ }
 inline Size DAG::GetNumParents(Vertex v) const { /* code */ }
 inline Size DAG::GetChild(Vertex v, Size i) const { /* code */ }
