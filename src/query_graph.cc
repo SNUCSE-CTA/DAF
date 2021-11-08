@@ -7,7 +7,13 @@
 
 namespace daf {
 QueryGraph::QueryGraph() {}
-QueryGraph::~QueryGraph() { /* code */ }
+QueryGraph::~QueryGraph() {
+  delete[] NEC_map_;
+  delete[] NEC_elems_;
+
+  if (NEC_start_offs_) delete[] NEC_start_offs_;
+  delete[] NEC_size_;
+}
 
 bool QueryGraph::LoadAndProcessGraph(const std::string &filename,
                                      const DataGraph &data) { /* code */ }
