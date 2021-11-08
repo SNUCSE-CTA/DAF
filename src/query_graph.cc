@@ -78,5 +78,80 @@ struct NECInfo {
 };
 }  // namespace
 
-void QueryGraph::ExtractResidualStructure() { /* code */ }
+void QueryGraph::ExtractResidualStructure() {
+  NECInfo *NEC_infos_temp = new NECInfo[GetNumVertices() * (max_label_ + 1)];
+  NEC_elems_ = new NECElement[GetNumVertices()];
+  NEC_map_ = new Vertex[GetNumVertices()];
+  NEC_size_ = new Size[GetNumVertices()];
+
+  Size num_NEC_elems_ = 0;
+
+  std::fill(NEC_map_, NEC_map_ + GetNumVertices(), -1);
+  std::fill(NEC_size_, NEC_size_ + GetNumVertices(), 0);
+
+  num_non_leaf_vertices_ = GetNumVertices();
+
+  // construct NEC map
+  for (Vertex v = 0; v < GetNumVertices(); ++v) {
+    if (GetDegree(v) == 1) {
+      Vertex p = GetNeighbor(GetStartOffset(v));
+      Label l = GetLabel(v);
+
+      NECInfo &info = NEC_infos_temp[GetNumVertices() * l + p];
+      if (!info.visit) {
+        info = {true, v, num_NEC_elems_};
+        NEC_map_[v] = v;
+
+        for (Size nbr_idx = GetStartOffset(p); nbr_idx < GetEndOffset(p);
+             ++nbr_idx) {
+          Vertex nbr = GetNeighbor(nbr_idx);
+          if (nbr == v) {
+            NEC_elems_[num_NEC_elems_] = {l, p, v, 0,
+                                          nbr_idx - GetStartOffset(p)};
+            break;
+          }
+        }
+        num_NEC_elems_ += 1;
+      } else {
+        NEC_map_[v] = info.representation;
+      }
+      NEC_size_[info.representation] += 1;
+      NEC_elems_[info.NEC_elems_idx].size += 1;
+      num_non_leaf_vertices_ -= 1;
+    } else {
+      NEC_size_[v] += 1;
+    }
+  }
+
+  for (Vertex v = 0; v < GetNumVertices(); ++v) {
+    NEC_size_[v] = NEC_size_[GetNECRepresentative(v)];
+  }
+
+  num_NEC_label_ = 0;
+  NEC_start_offs_ = nullptr;
+  if (num_NEC_elems_ > 0) {
+    // sort NEC elems by label
+    std::sort(NEC_elems_, NEC_elems_ + num_NEC_elems_,
+              [](const NECElement &a, const NECElement &b) -> bool {
+                return a.label < b.label;
+              });
+
+    // construct start offsets of NEC elems for same label
+    NEC_start_offs_ = new Size[GetNumVertices() + 1];
+    NEC_start_offs_[0] = 0;
+    num_NEC_label_ += 1;
+
+    Label prev_label = NEC_elems_[0].label;
+    for (Size i = 1; i < num_NEC_elems_; ++i) {
+      if (NEC_elems_[i].label != prev_label) {
+        prev_label = NEC_elems_[i].label;
+        NEC_start_offs_[num_NEC_label_] = i;
+        num_NEC_label_ += 1;
+      }
+    }
+    NEC_start_offs_[num_NEC_label_] = num_NEC_elems_;
+  }
+
+  delete[] NEC_infos_temp;
+}
 }  // namespace daf
