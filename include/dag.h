@@ -41,7 +41,7 @@ class DAG {
 inline Vertex DAG::GetRoot() const { return bfs_sequence_[0]; }
 inline Size DAG::GetNumChildren(Vertex v) const { return num_children_[v]; }
 inline Size DAG::GetNumParents(Vertex v) const { return num_parents_[v]; }
-inline Size DAG::GetChild(Vertex v, Size i) const { /* code */ }
+inline Size DAG::GetChild(Vertex v, Size i) const { return children_[v][i]; }
 inline Size DAG::GetParent(Vertex v, Size i) const { /* code */ }
 inline Size DAG::GetInitCandSize(Vertex v) const { /* code */ }
 inline Vertex DAG::GetVertexOrderedByBFS(Size i) const { /* code */ }
