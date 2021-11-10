@@ -44,7 +44,9 @@ inline Size DAG::GetNumParents(Vertex v) const { return num_parents_[v]; }
 inline Size DAG::GetChild(Vertex v, Size i) const { return children_[v][i]; }
 inline Size DAG::GetParent(Vertex v, Size i) const { return parents_[v][i]; }
 inline Size DAG::GetInitCandSize(Vertex v) const { return init_cand_size_[v]; }
-inline Vertex DAG::GetVertexOrderedByBFS(Size i) const { /* code */ }
+inline Vertex DAG::GetVertexOrderedByBFS(Size i) const {
+  return bfs_sequence_[i];
+}
 
 }  // namespace daf
 
