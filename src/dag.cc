@@ -25,7 +25,21 @@ DAG::DAG(const DataGraph &data, const QueryGraph &query)
   std::fill(num_parents_, num_parents_ + query.GetNumVertices(), 0);
 }
 
-DAG::~DAG() { /* code */ }
+DAG::~DAG() {
+  delete[] bfs_sequence_;
+
+  for (Size i = 0; i < query_.GetNumVertices(); ++i) {
+    delete[] children_[i];
+    delete[] parents_[i];
+  }
+  delete[] children_;
+  delete[] parents_;
+
+  delete[] num_children_;
+  delete[] num_parents_;
+
+  delete[] init_cand_size_;
+}
 
 void DAG::BuildDAG() { /* code */ }
 
