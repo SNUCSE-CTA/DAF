@@ -111,5 +111,27 @@ void DAG::BuildDAG() {
   delete[] popped;
 }
 
-Vertex DAG::SelectRootVertex() { /* code */ }
+Vertex DAG::SelectRootVertex() {
+  Vertex root = 0;
+  double min_rank = std::numeric_limits<double>::max();
+
+  for (Vertex v = 0; v < query_.GetNumVertices(); ++v) {
+    Label l = query_.GetLabel(v);
+    Size d = query_.GetDegree(v);
+    init_cand_size_[v] = data_.GetInitCandSize(l, d);
+
+    if (query_.GetCoreNum(v) < 2 && !query_.IsTree()) continue;
+    if (query_.IsInNEC(v) && !query_.IsNECRepresentation(v)) continue;
+
+    double rank =
+        static_cast<double>(init_cand_size_[v]) / static_cast<double>(d);
+
+    if (rank < min_rank) {
+      root = v;
+      min_rank = rank;
+    }
+  }
+
+  return root;
+}
 }  // namespace daf
