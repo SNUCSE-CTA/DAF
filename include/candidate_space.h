@@ -59,7 +59,9 @@ inline Size CandidateSpace::GetCandidateSetSize(Vertex u) const {
   return candidate_set_size_[u];
 }
 
-inline Vertex CandidateSpace::GetCandidate(Vertex u, Size v_idx) const { /* code */ }
+inline Vertex CandidateSpace::GetCandidate(Vertex u, Size v_idx) const {
+  return candidate_set_[u][v_idx];
+}
 
 inline Size CandidateSpace::GetCandidateStartOffset(Vertex u, Size u_adj_idx,
                                                     Size v_idx) const { /* code */ }
