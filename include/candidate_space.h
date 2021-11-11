@@ -55,7 +55,9 @@ class CandidateSpace {
                              uint64_t *label_set);
 };
 
-inline Size CandidateSpace::GetCandidateSetSize(Vertex u) const { /* code */ }
+inline Size CandidateSpace::GetCandidateSetSize(Vertex u) const {
+  return candidate_set_size_[u];
+}
 
 inline Vertex CandidateSpace::GetCandidate(Vertex u, Size v_idx) const { /* code */ }
 
