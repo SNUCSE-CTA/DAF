@@ -3,7 +3,37 @@
 namespace daf {
 CandidateSpace::CandidateSpace(const DataGraph &data, const QueryGraph &query,
                                const DAG &dag)
-    : data_(data), query_(query), dag_(dag) { /* code */ }
+    : data_(data), query_(query), dag_(dag) {
+  candidate_set_size_ = new Size[query_.GetNumVertices()];
+  candidate_set_ = new Vertex *[query_.GetNumVertices()];
+
+  for (Vertex v = 0; v < query_.GetNumVertices(); ++v) {
+    if (query_.IsInNEC(v) && !query_.IsNECRepresentation(v))
+      candidate_set_[v] = nullptr;
+    else
+      candidate_set_[v] = new Vertex[dag_.GetInitCandSize(v)];
+  }
+
+  candidate_offsets_ =
+      new Size *[query_.GetNumVertices() * query_.GetMaxDegree()];
+  linear_cs_adj_list_ = nullptr;
+
+  num_visit_cs_ = new Size[data_.GetNumVertices()];
+  visited_candidates_ =
+      new Vertex[data_.GetNumVertices() * query_.GetNumVertices()];
+  cand_to_cs_idx_ = new Size[data_.GetNumVertices()];
+
+  num_visitied_candidates_ = 0;
+
+  std::fill(num_visit_cs_, num_visit_cs_ + data_.GetNumVertices(), 0);
+  std::fill(candidate_set_size_, candidate_set_size_ + query_.GetNumVertices(),
+            0);
+  std::fill(
+      candidate_offsets_,
+      candidate_offsets_ + query_.GetNumVertices() * query_.GetMaxDegree(),
+      nullptr);
+  std::fill(cand_to_cs_idx_, cand_to_cs_idx_ + data_.GetNumVertices(), -1);
+}
 
 CandidateSpace::~CandidateSpace() { /* code */ }
 
