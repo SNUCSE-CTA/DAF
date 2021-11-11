@@ -64,7 +64,9 @@ inline Vertex CandidateSpace::GetCandidate(Vertex u, Size v_idx) const {
 }
 
 inline Size CandidateSpace::GetCandidateStartOffset(Vertex u, Size u_adj_idx,
-                                                    Size v_idx) const { /* code */ }
+                                                    Size v_idx) const {
+  return candidate_offsets_[u * query_.GetMaxDegree() + u_adj_idx][v_idx];
+}
 
 inline Size CandidateSpace::GetCandidateEndOffset(Vertex u, Size u_adj_idx,
                                                   Size v_idx) const { /* code */ }
