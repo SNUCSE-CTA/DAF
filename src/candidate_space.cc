@@ -35,7 +35,24 @@ CandidateSpace::CandidateSpace(const DataGraph &data, const QueryGraph &query,
   std::fill(cand_to_cs_idx_, cand_to_cs_idx_ + data_.GetNumVertices(), -1);
 }
 
-CandidateSpace::~CandidateSpace() { /* code */ }
+CandidateSpace::~CandidateSpace() {
+  delete[] candidate_set_size_;
+
+  for (Vertex v = 0; v < query_.GetNumVertices(); ++v) {
+    if (candidate_set_[v] != nullptr) delete[] candidate_set_[v];
+  }
+  delete[] candidate_set_;
+
+  for (Size i = 0; i < query_.GetNumVertices() * query_.GetMaxDegree(); ++i) {
+    if (candidate_offsets_[i]) delete[] candidate_offsets_[i];
+  }
+  delete[] candidate_offsets_;
+  if (linear_cs_adj_list_ != nullptr) delete[] linear_cs_adj_list_;
+
+  delete[] num_visit_cs_;
+  delete[] visited_candidates_;
+  delete[] cand_to_cs_idx_;
+}
 
 bool CandidateSpace::BuildCS() { /* code */ }
 
