@@ -73,7 +73,9 @@ inline Size CandidateSpace::GetCandidateEndOffset(Vertex u, Size u_adj_idx,
   return candidate_offsets_[u * query_.GetMaxDegree() + u_adj_idx][v_idx + 1];
 }
 
-inline Size CandidateSpace::GetCandidateIndex(Size idx) const { /* code */ }
+inline Size CandidateSpace::GetCandidateIndex(Size idx) const {
+  return linear_cs_adj_list_[idx];
+}
 
 }  // namespace daf
 
