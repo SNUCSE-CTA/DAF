@@ -54,7 +54,15 @@ CandidateSpace::~CandidateSpace() {
   delete[] cand_to_cs_idx_;
 }
 
-bool CandidateSpace::BuildCS() { /* code */ }
+bool CandidateSpace::BuildCS() {
+  if (!FilterByTopDownWithInit()) return false;
+  if (!FilterByBottomUp()) return false;
+  if (!FilterByTopDown()) return false;
+
+  ConstructCS();
+
+  return true;
+}
 
 bool CandidateSpace::FilterByTopDownWithInit() { /* code */ }
 
