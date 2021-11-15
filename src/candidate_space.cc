@@ -401,5 +401,18 @@ void CandidateSpace::AllocateSpaceForCS() {
 }
 
 void CandidateSpace::ComputeNbrInformation(Vertex u, Size *max_nbr_degree,
-                                           uint64_t *nbr_label_bitset) { /* code */ }
+                                           uint64_t *nbr_label_bitset) {
+  *max_nbr_degree = 0;
+  std::fill(nbr_label_bitset, nbr_label_bitset + data_.GetNbrBitsetSize(),
+            0ull);
+  for (Size i = query_.GetStartOffset(u); i < query_.GetEndOffset(u); ++i) {
+    Vertex adj = query_.GetNeighbor(i);
+
+    nbr_label_bitset[query_.GetLabel(adj) / (sizeof(uint64_t) * CHAR_BIT)] |=
+        1ull << (query_.GetLabel(adj) % (sizeof(uint64_t) * CHAR_BIT));
+
+    if (query_.GetDegree(adj) > *max_nbr_degree)
+      *max_nbr_degree = query_.GetDegree(adj);
+  }
+}
 }  // namespace daf
