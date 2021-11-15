@@ -192,7 +192,61 @@ bool CandidateSpace::FilterByBottomUp() {
   return result;
 }
 
-bool CandidateSpace::FilterByTopDown() { /* code */ }
+bool CandidateSpace::FilterByTopDown() {
+  bool result = true;
+  for (Size i = 1; i < query_.GetNumVertices(); ++i) {
+    Vertex cur = dag_.GetVertexOrderedByBFS(i);
+    if (query_.IsInNEC(cur) && !query_.IsNECRepresentation(cur)) continue;
+
+    Label cur_label = query_.GetLabel(cur);
+
+    Size num_parent = 0;
+    for (Size i = 0; i < dag_.GetNumParents(cur); ++i) {
+      Vertex parent = dag_.GetParent(cur, i);
+
+      for (Size i = 0; i < candidate_set_size_[parent]; ++i) {
+        Vertex parent_cand = candidate_set_[parent][i];
+
+        for (Size i = data_.GetStartOffset(parent_cand, cur_label);
+             i < data_.GetEndOffset(parent_cand, cur_label); ++i) {
+          Vertex cand = data_.GetNeighbor(i);
+          if (data_.GetDegree(cand) < query_.GetDegree(cur)) break;
+
+          if (num_visit_cs_[cand] == num_parent) {
+            num_visit_cs_[cand] += 1;
+            if (num_parent == 0) {
+              visited_candidates_[num_visitied_candidates_] = cand;
+              num_visitied_candidates_ += 1;
+            }
+          }
+        }
+      }
+      num_parent += 1;
+    }
+
+    for (Size i = 0; i < candidate_set_size_[cur]; ++i) {
+      Vertex cand = candidate_set_[cur][i];
+      if (num_visit_cs_[cand] != num_parent) {
+        std::swap(candidate_set_[cur][i],
+                  candidate_set_[cur][candidate_set_size_[cur] - 1]);
+        candidate_set_size_[cur] -= 1;
+        --i;
+      }
+    }
+
+    if (candidate_set_size_[cur] == 0) {
+      result = false;
+      break;
+    }
+
+    while (num_visitied_candidates_ > 0) {
+      num_visitied_candidates_ -= 1;
+      num_visit_cs_[visited_candidates_[num_visitied_candidates_]] = 0;
+    }
+  }
+
+  return result;
+}
 
 void CandidateSpace::ConstructCS() { /* code */ }
 
