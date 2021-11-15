@@ -310,7 +310,32 @@ void CandidateSpace::ConstructCS() {
   }
 }
 
-bool CandidateSpace::InitRootCandidates() { /* code */ }
+bool CandidateSpace::InitRootCandidates() {
+  Vertex root = dag_.GetRoot();
+  Label root_label = query_.GetLabel(root);
+
+  uint64_t *nbr_label_bitset = new uint64_t[data_.GetNbrBitsetSize()];
+  Size max_nbr_degree;
+
+  ComputeNbrInformation(root, &max_nbr_degree, nbr_label_bitset);
+
+  for (Size i = data_.GetStartOffsetByLabel(root_label);
+       i < data_.GetEndOffsetByLabel(root_label); ++i) {
+    Vertex cand = data_.GetVertexBySortedLabelOffset(i);
+
+    if (data_.GetDegree(cand) < query_.GetDegree(root)) break;
+
+    if (data_.GetCoreNum(cand) >= query_.GetCoreNum(root) &&
+        data_.CheckAllNbrLabelExist(cand, nbr_label_bitset) &&
+        data_.GetMaxNbrDegree(cand) >= max_nbr_degree) {
+      candidate_set_[root][candidate_set_size_[root]] = cand;
+      candidate_set_size_[root] += 1;
+    }
+  }
+
+  delete[] nbr_label_bitset;
+  return candidate_set_size_[root] > 0;
+}
 
 void CandidateSpace::AllocateSpaceForCS() { /* code */ }
 
