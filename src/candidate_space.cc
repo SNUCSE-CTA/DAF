@@ -248,7 +248,67 @@ bool CandidateSpace::FilterByTopDown() {
   return result;
 }
 
-void CandidateSpace::ConstructCS() { /* code */ }
+void CandidateSpace::ConstructCS() {
+  AllocateSpaceForCS();
+
+  for (Size i = 0; i < query_.GetNumVertices(); ++i) {
+    Vertex u = dag_.GetVertexOrderedByBFS(i);
+
+    if (query_.IsInNEC(u) && !query_.IsNECRepresentation(u)) continue;
+
+    Label u_label = query_.GetLabel(u);
+    Size u_degree = query_.GetDegree(u);
+
+    for (Size i = 0; i < candidate_set_size_[u]; ++i) {
+      cand_to_cs_idx_[candidate_set_[u][i]] = i;
+    }
+
+    for (Size i = query_.GetStartOffset(u); i < query_.GetEndOffset(u); ++i) {
+      Vertex u_adj = query_.GetNeighbor(i);
+
+      if (query_.IsInNEC(u_adj) && !query_.IsNECRepresentation(u_adj)) continue;
+
+      Size u_adj_idx = i - query_.GetStartOffset(u);
+
+      Size start_offset =
+          candidate_offsets_[u * query_.GetMaxDegree() + u_adj_idx][0];
+
+      for (Size v_adj_idx = 0; v_adj_idx < candidate_set_size_[u_adj];
+           ++v_adj_idx) {
+        Vertex v_adj = candidate_set_[u_adj][v_adj_idx];
+
+        for (Size i = data_.GetStartOffset(v_adj, u_label);
+             i < data_.GetEndOffset(v_adj, u_label); ++i) {
+          Vertex v = data_.GetNeighbor(i);
+
+          if (data_.GetDegree(v) < u_degree) break;
+
+          Size v_idx = cand_to_cs_idx_[v];
+
+          if (v_idx != -1) {
+            linear_cs_adj_list_[candidate_offsets_[u * query_.GetMaxDegree() +
+                                                   u_adj_idx][v_idx]] =
+                v_adj_idx;
+            candidate_offsets_[u * query_.GetMaxDegree() + u_adj_idx][v_idx] +=
+                1;
+          }
+        }
+      }
+
+      for (Size i = GetCandidateSetSize(u) - 1; i > 0; --i) {
+        candidate_offsets_[u * query_.GetMaxDegree() + u_adj_idx][i] =
+            candidate_offsets_[u * query_.GetMaxDegree() + u_adj_idx][i - 1];
+      }
+
+      candidate_offsets_[u * query_.GetMaxDegree() + u_adj_idx][0] =
+          start_offset;
+    }
+
+    for (Size i = 0; i < candidate_set_size_[u]; ++i) {
+      cand_to_cs_idx_[candidate_set_[u][i]] = -1;
+    }
+  }
+}
 
 bool CandidateSpace::InitRootCandidates() { /* code */ }
 
