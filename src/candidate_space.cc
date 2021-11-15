@@ -133,7 +133,64 @@ bool CandidateSpace::FilterByTopDownWithInit() {
   return result;
 }
 
-bool CandidateSpace::FilterByBottomUp() { /* code */ }
+bool CandidateSpace::FilterByBottomUp() {
+  bool result = true;
+  for (Size i = 0; i < query_.GetNumVertices(); ++i) {
+    Vertex cur = dag_.GetVertexOrderedByBFS(query_.GetNumVertices() - i - 1);
+
+    if (dag_.GetNumChildren(cur) == 0) continue;
+
+    Label cur_label = query_.GetLabel(cur);
+
+    Size num_child = 0;
+    for (Size i = 0; i < dag_.GetNumChildren(cur); ++i) {
+      Vertex child = dag_.GetChild(cur, i);
+
+      if (query_.IsInNEC(child) && !query_.IsNECRepresentation(child)) continue;
+
+      for (Size i = 0; i < candidate_set_size_[child]; ++i) {
+        Vertex child_cand = candidate_set_[child][i];
+
+        for (Size i = data_.GetStartOffset(child_cand, cur_label);
+             i < data_.GetEndOffset(child_cand, cur_label); ++i) {
+          Vertex cand = data_.GetNeighbor(i);
+          if (data_.GetDegree(cand) < query_.GetDegree(cur)) break;
+
+          if (num_visit_cs_[cand] == num_child) {
+            num_visit_cs_[cand] += 1;
+            if (num_child == 0) {
+              visited_candidates_[num_visitied_candidates_] = cand;
+              num_visitied_candidates_ += 1;
+            }
+          }
+        }
+      }
+      num_child += 1;
+    }
+
+    for (Size i = 0; i < candidate_set_size_[cur]; ++i) {
+      Vertex cand = candidate_set_[cur][i];
+      if (num_visit_cs_[cand] != num_child) {
+        std::swap(candidate_set_[cur][i],
+                  candidate_set_[cur][candidate_set_size_[cur] - 1]);
+        candidate_set_size_[cur] -= 1;
+        --i;
+      }
+    }
+
+    if (candidate_set_size_[cur] == 0) {
+      result = false;
+      break;
+    }
+
+    while (num_visitied_candidates_ > 0) {
+      num_visitied_candidates_ -= 1;
+      num_visit_cs_[visited_candidates_[num_visitied_candidates_]] = 0;
+    }
+  }
+
+  return result;
+}
 
 bool CandidateSpace::FilterByTopDown() { /* code */ }
 
