@@ -10,7 +10,10 @@ Ordering::Ordering(Size num_query_vertices)
             std::numeric_limits<Size>::max());
 }
 
-Ordering::~Ordering() { /* code */ }
+Ordering::~Ordering() {
+  delete[] extendable_queue_;
+  delete[] weights_;
+}
 
 void Ordering::Insert(Vertex u, Size weight) { /* code */ }
 
