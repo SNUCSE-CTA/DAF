@@ -15,7 +15,11 @@ Ordering::~Ordering() {
   delete[] weights_;
 }
 
-void Ordering::Insert(Vertex u, Size weight) { /* code */ }
+void Ordering::Insert(Vertex u, Size weight) {
+  extendable_queue_[extendable_queue_size_] = u;
+  extendable_queue_size_ += 1;
+  weights_[u] = weight;
+}
 
 void Ordering::UpdateWeight(Vertex u, Size weight) { /* code */ }
 
