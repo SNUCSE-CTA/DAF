@@ -35,7 +35,9 @@ void Ordering::Remove(Vertex u) {
   }
 }
 
-bool Ordering::Exists(Vertex u) { /* code */ }
+bool Ordering::Exists(Vertex u) {
+  return weights_[u] != std::numeric_limits<Size>::max();
+}
 
 Vertex Ordering::PopMinWeight() { /* code */ }
 }  // namespace daf
