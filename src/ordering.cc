@@ -39,5 +39,22 @@ bool Ordering::Exists(Vertex u) {
   return weights_[u] != std::numeric_limits<Size>::max();
 }
 
-Vertex Ordering::PopMinWeight() { /* code */ }
+Vertex Ordering::PopMinWeight() {
+  Size popped_idx = 0;
+
+  for (Size i = 1; i < extendable_queue_size_; ++i) {
+    if (weights_[extendable_queue_[i]] <
+        weights_[extendable_queue_[popped_idx]])
+      popped_idx = i;
+  }
+
+  Vertex popped_vtx = extendable_queue_[popped_idx];
+
+  weights_[popped_vtx] = std::numeric_limits<Size>::max();
+  std::swap(extendable_queue_[popped_idx],
+            extendable_queue_[extendable_queue_size_ - 1]);
+  extendable_queue_size_ -= 1;
+
+  return popped_vtx;
+}
 }  // namespace daf
