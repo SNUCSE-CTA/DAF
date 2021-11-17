@@ -23,7 +23,17 @@ void Ordering::Insert(Vertex u, Size weight) {
 
 void Ordering::UpdateWeight(Vertex u, Size weight) { weights_[u] = weight; }
 
-void Ordering::Remove(Vertex u) { /* code */ }
+void Ordering::Remove(Vertex u) {
+  for (Size i = 0; i < extendable_queue_size_; ++i) {
+    if (extendable_queue_[i] == u) {
+      weights_[u] = std::numeric_limits<Size>::max();
+      std::swap(extendable_queue_[i],
+                extendable_queue_[extendable_queue_size_ - 1]);
+      extendable_queue_size_ -= 1;
+      return;
+    }
+  }
+}
 
 bool Ordering::Exists(Vertex u) { /* code */ }
 
