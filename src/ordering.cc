@@ -21,7 +21,7 @@ void Ordering::Insert(Vertex u, Size weight) {
   weights_[u] = weight;
 }
 
-void Ordering::UpdateWeight(Vertex u, Size weight) { /* code */ }
+void Ordering::UpdateWeight(Vertex u, Size weight) { weights_[u] = weight; }
 
 void Ordering::Remove(Vertex u) { /* code */ }
 
