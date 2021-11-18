@@ -73,7 +73,7 @@ class BacktrackHelper {
 
   Size degree_ = -1;
 };
-inline BacktrackHelper::BacktrackHelper() { /* code */ }
+inline BacktrackHelper::BacktrackHelper() {}
 
 inline BacktrackHelper::~BacktrackHelper() { /* code */ }
 
