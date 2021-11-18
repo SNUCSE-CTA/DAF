@@ -75,7 +75,18 @@ class BacktrackHelper {
 };
 inline BacktrackHelper::BacktrackHelper() {}
 
-inline BacktrackHelper::~BacktrackHelper() { /* code */ }
+inline BacktrackHelper::~BacktrackHelper() {
+  if (degree_ != -1) {
+    delete[] ancestors_;
+    delete[] num_extendable_indices_;
+
+    for (Size i = 0; i < degree_; ++i) {
+      delete[] extendable_indices_[i];
+    }
+    delete[] extendable_indices_;
+    delete[] lastly_mapped_neighbor_;
+  }
+}
 
 inline void BacktrackHelper::Initialize(Size num_query_vtx, Size degree,
                                         Size cs_size, Vertex u) { /* code */ }
