@@ -154,7 +154,23 @@ uint64_t Backtrack::FindMatches(uint64_t limit) {
   return num_embeddings_;
 }
 
-Vertex Backtrack::GetRootVertex() { /* code */ }
+Vertex Backtrack::GetRootVertex() {
+  Vertex root_vertex = 0;
+  Size root_cs_size = std::numeric_limits<Size>::max();
+
+  for (Vertex u = 0; u < query_.GetNumVertices(); ++u) {
+    if (query_.IsInNEC(u)) continue;
+
+    Size u_cs_size = cs_.GetCandidateSetSize(u);
+
+    if (root_cs_size > u_cs_size) {
+      root_vertex = u;
+      root_cs_size = u_cs_size;
+    }
+  }
+
+  return root_vertex;
+}
 
 void Backtrack::InitializeNodeStack() { /* code */ }
 
