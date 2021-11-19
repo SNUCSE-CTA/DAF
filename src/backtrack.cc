@@ -172,7 +172,14 @@ Vertex Backtrack::GetRootVertex() {
   return root_vertex;
 }
 
-void Backtrack::InitializeNodeStack() { /* code */ }
+void Backtrack::InitializeNodeStack() {
+  for (Size d = 0; d <= query_.GetNumNonLeafVertices(); ++d) {
+    SearchTreeNode *node = node_stack_ + d;
+
+    node->initialized = false;
+    node->failing_set.resize(query_.GetNumVertices());
+  }
+}
 
 void Backtrack::ComputeExtendable(Vertex u, Vertex u_nbr, Size u_nbr_idx,
                                   Size cs_v_idx) { /* code */ }
