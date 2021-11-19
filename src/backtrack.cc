@@ -44,7 +44,115 @@ Backtrack::~Backtrack() {
   }
 }
 
-uint64_t Backtrack::FindMatches(uint64_t limit) { /* code */ }
+uint64_t Backtrack::FindMatches(uint64_t limit) {
+  Vertex root_vertex = GetRootVertex();
+  Size root_cs_size = cs_.GetCandidateSetSize(root_vertex);
+
+  extendable_queue_->Insert(root_vertex, root_cs_size);
+
+  InitializeNodeStack();
+
+  while (backtrack_depth_ >= 0) {
+    if (num_embeddings_ >= limit) {
+      return num_embeddings_;
+    }
+
+    SearchTreeNode *parent_node = node_stack_ + backtrack_depth_;
+    SearchTreeNode *cur_node = node_stack_ + backtrack_depth_ + 1;
+
+    BacktrackHelper *u_helper;
+
+    if (cur_node->initialized == false) {
+      // newly expanded search tree node
+      num_backtrack_calls_ += 1;
+
+      cur_node->initialized = true;
+      cur_node->u = extendable_queue_->PopMinWeight();
+      cur_node->v_idx = 0;
+      cur_node->embedding_founded = false;
+      cur_node->failing_set.reset();
+
+      u_helper = helpers_ + cur_node->u;
+      u_helper->GetMappingState() = MAPPED;
+    } else {
+      // backtrack from child node
+      ReleaseNeighbors(cur_node);
+
+      u_helper = helpers_ + cur_node->u;
+
+      // compute failing set of parent node (non-leaf node)
+      if (cur_node->embedding_founded) {
+        // case 1
+        parent_node->embedding_founded = true;
+        cur_node->v_idx += 1;
+      } else {
+        if (cur_node->failing_set.test(cur_node->u) == false) {
+          // case 2.1
+          parent_node->failing_set = cur_node->failing_set;
+          cur_node->v_idx = std::numeric_limits<Size>::max();
+        } else {
+          // case 2.2
+          parent_node->failing_set |= cur_node->failing_set;
+          cur_node->v_idx += 1;
+        }
+      }
+    }
+
+    Size num_extendable = u_helper->GetNumExtendable();
+
+    while (cur_node->v_idx < num_extendable) {
+      Size cs_v_idx = u_helper->GetExtendableIndex(cur_node->v_idx);
+      cur_node->v = cs_.GetCandidate(cur_node->u, cs_v_idx);
+
+      if (mapped_query_vtx_[cur_node->v] == -1) {
+        bool success = ComputeExtendableForAllNeighbors(cur_node, cs_v_idx);
+
+        if (!success) {
+          // go to sibling node (need to compute failing set of parent node)
+          break;
+        } else if (backtrack_depth_ + 1 == query_.GetNumNonLeafVertices()) {
+          // embedding class
+          uint64_t num_cur_embeddings;
+
+          if (query_.GetNumNonLeafVertices() == query_.GetNumVertices()) {
+            num_cur_embeddings = 1;
+          } else {
+            num_cur_embeddings = match_leaves_->Match(limit - num_embeddings_);
+          }
+
+          cur_node->embedding_founded = true;
+          num_embeddings_ += num_cur_embeddings;
+          break;
+        } else {
+          // expand to child node
+          backtrack_depth_ += 1;
+          break;
+        }
+      } else {
+        // conflict class
+        if (parent_node->embedding_founded == false) {
+          Vertex u_conflict = mapped_query_vtx_[cur_node->v];
+          BacktrackHelper *u_conflict_helper = helpers_ + u_conflict;
+
+          parent_node->failing_set |=
+              u_helper->GetAncestor() | u_conflict_helper->GetAncestor();
+        }
+
+        cur_node->v_idx += 1;
+      }
+    }
+    if (cur_node->v_idx >= num_extendable) {
+      // go to parent node
+      extendable_queue_->Insert(cur_node->u, num_extendable);
+      u_helper->GetMappingState() = UNMAPPED;
+      cur_node->initialized = false;
+
+      backtrack_depth_ -= 1;
+    }
+  }
+
+  return num_embeddings_;
+}
 
 Vertex Backtrack::GetRootVertex() { /* code */ }
 
