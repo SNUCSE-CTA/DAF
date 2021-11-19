@@ -32,7 +32,17 @@ Backtrack::Backtrack(const DataGraph &data, const QueryGraph &query,
   }
 }
 
-Backtrack::~Backtrack() { /* code */ }
+Backtrack::~Backtrack() {
+  delete[] mapped_query_vtx_;
+  delete[] node_stack_;
+  delete[] mapped_nodes_;
+  delete[] helpers_;
+
+  delete extendable_queue_;
+  if (match_leaves_ != nullptr) {
+    delete match_leaves_;
+  }
+}
 
 uint64_t Backtrack::FindMatches(uint64_t limit) { /* code */ }
 
