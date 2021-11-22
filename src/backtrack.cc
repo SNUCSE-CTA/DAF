@@ -273,5 +273,32 @@ bool Backtrack::ComputeExtendableForAllNeighbors(SearchTreeNode *cur_node,
   return true;
 }
 
-void Backtrack::ReleaseNeighbors(SearchTreeNode *cur_node) { /* code */ }
+void Backtrack::ReleaseNeighbors(SearchTreeNode *cur_node) {
+  Size start_offset = query_.GetStartOffset(cur_node->u);
+  Size end_offset = query_.GetEndOffset(cur_node->u);
+
+  for (Size u_nbr_idx = start_offset; u_nbr_idx < end_offset; ++u_nbr_idx) {
+    Vertex u_nbr = query_.GetNeighbor(u_nbr_idx);
+
+    BacktrackHelper *u_nbr_helper = helpers_ + u_nbr;
+
+    if (u_nbr_helper->GetMappingState() == MAPPED || query_.IsInNEC(u_nbr))
+      continue;
+
+    if (u_nbr_helper->GetLastlyMappedNeighbor() != cur_node->u) break;
+
+    Size num_prev_extendable = u_nbr_helper->GetNumPrevExtendable();
+
+    u_nbr_helper->RemoveMapping();
+
+    if (!query_.IsInNEC(u_nbr)) {
+      if (u_nbr_helper->GetNumMappedNeighbors() == 0) {
+        extendable_queue_->Remove(u_nbr);
+      } else {
+        extendable_queue_->UpdateWeight(u_nbr, num_prev_extendable);
+      }
+    }
+  }
+  mapped_query_vtx_[cur_node->v] = -1;
+}
 }  // namespace daf
