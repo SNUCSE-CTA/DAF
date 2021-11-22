@@ -226,7 +226,12 @@ void Backtrack::ComputeExtendable(Vertex u, Vertex u_nbr, Size u_nbr_idx,
   }
 }
 
-void Backtrack::ComputeDynamicAncestor(Vertex ancsetor, Vertex child) { /* code */ }
+void Backtrack::ComputeDynamicAncestor(Vertex ancsetor, Vertex child) {
+  BacktrackHelper *child_helper = helpers_ + child;
+  BacktrackHelper *ancestor_helper = helpers_ + ancsetor;
+
+  child_helper->GetAncestor() |= ancestor_helper->GetAncestor();
+}
 
 bool Backtrack::ComputeExtendableForAllNeighbors(SearchTreeNode *cur_node,
                                                  Size cs_v_idx) { /* code */ }
