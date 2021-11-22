@@ -234,7 +234,44 @@ void Backtrack::ComputeDynamicAncestor(Vertex ancsetor, Vertex child) {
 }
 
 bool Backtrack::ComputeExtendableForAllNeighbors(SearchTreeNode *cur_node,
-                                                 Size cs_v_idx) { /* code */ }
+                                                 Size cs_v_idx) {
+  Size start_offset = query_.GetStartOffset(cur_node->u);
+  Size end_offset = query_.GetEndOffset(cur_node->u);
+
+  mapped_query_vtx_[cur_node->v] = cur_node->u;
+  mapped_nodes_[cur_node->u] = cur_node;
+
+  for (Size u_nbr_idx = start_offset; u_nbr_idx < end_offset; ++u_nbr_idx) {
+    Vertex u_nbr = query_.GetNeighbor(u_nbr_idx);
+
+    BacktrackHelper *u_nbr_helper = helpers_ + u_nbr;
+
+    if (u_nbr_helper->GetMappingState() == MAPPED || query_.IsInNEC(u_nbr))
+      continue;
+
+    u_nbr_helper->AddMapping(cur_node->u);
+
+    ComputeExtendable(cur_node->u, u_nbr, u_nbr_idx - start_offset, cs_v_idx);
+    ComputeDynamicAncestor(cur_node->u, u_nbr);
+
+    Size num_extendable = u_nbr_helper->GetNumExtendable();
+
+    if (!query_.IsInNEC(u_nbr)) {
+      if (u_nbr_helper->GetNumMappedNeighbors() == 1) {
+        extendable_queue_->Insert(u_nbr, num_extendable);
+      } else {
+        extendable_queue_->UpdateWeight(u_nbr, num_extendable);
+      }
+    }
+
+    if (num_extendable == 0) {
+      // compute failing set (emptyset class)
+      cur_node->failing_set = u_nbr_helper->GetAncestor();
+      return false;
+    }
+  }
+  return true;
+}
 
 void Backtrack::ReleaseNeighbors(SearchTreeNode *cur_node) { /* code */ }
 }  // namespace daf
