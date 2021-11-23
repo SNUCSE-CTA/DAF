@@ -81,7 +81,17 @@ inline MaximumMatching::MaximumMatching(const DataGraph &data,
   std::fill(cand_to_v, cand_to_v + data_.GetNumVertices(), -1);
 }
 
-inline MaximumMatching::~MaximumMatching() { /* code */ }
+inline MaximumMatching::~MaximumMatching() {
+  delete[] pair_U;
+  delete[] pair_V;
+
+  delete[] cand_to_v;
+
+  delete[] dist;
+  delete[] queue;
+
+  delete[] nec_index;
+}
 
 inline Size MaximumMatching::ComputeMaximumMatching(Label label) { /* code */ }
 
