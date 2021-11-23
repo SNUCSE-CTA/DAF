@@ -93,7 +93,23 @@ inline MaximumMatching::~MaximumMatching() {
   delete[] nec_index;
 }
 
-inline Size MaximumMatching::ComputeMaximumMatching(Label label) { /* code */ }
+inline Size MaximumMatching::ComputeMaximumMatching(Label label) {
+  Size maximum_matching = 0;
+
+  std::fill(pair_U, pair_U + query_.GetNumVertices() + 1, NIL);
+  std::fill(pair_V, pair_V + data_.GetLabelFrequency(label) + 1, NIL);
+
+  // compute maximum matching with Hopcroft-Karp algorithm
+  while (BFS()) {
+    for (Size u = 1; u <= size_U; ++u) {
+      if (pair_U[u] == NIL) {
+        if (DFS(u)) maximum_matching += 1;
+      }
+    }
+  }
+
+  return maximum_matching;
+}
 
 inline void MaximumMatching::AddToU(Size u) { /* code */ }
 
