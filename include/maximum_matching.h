@@ -111,7 +111,10 @@ inline Size MaximumMatching::ComputeMaximumMatching(Label label) {
   return maximum_matching;
 }
 
-inline void MaximumMatching::AddToU(Size u) { /* code */ }
+inline void MaximumMatching::AddToU(Size u) {
+  size_U += 1;
+  nec_index[size_U] = u;
+}
 
 inline void MaximumMatching::AddToV(Size v) { /* code */ }
 
