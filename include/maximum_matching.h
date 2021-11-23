@@ -63,7 +63,23 @@ inline MaximumMatching::MaximumMatching(const DataGraph &data,
     : data_(data),
       query_(query),
       cs_(cs),
-      backtrack_helpers_(backtrack_helpers) { /* code */ }
+      backtrack_helpers_(backtrack_helpers) {
+  pair_U = new Size[query_.GetNumVertices() + 1];
+  pair_V = new Size[data_.GetMaxLabelFrequency() + 1];
+
+  dist = new Size[query_.GetNumVertices() + 1];
+  queue = new Size[query_.GetNumVertices() + 1];
+
+  nec_index = new Size[query_.GetNumVertices() + 1];
+
+  cand_to_v = new Size[data_.GetNumVertices()];
+
+  max_label_counter = data_.GetMaxLabelFrequency();
+  size_U = 0;
+  size_V = 0;
+
+  std::fill(cand_to_v, cand_to_v + data_.GetNumVertices(), -1);
+}
 
 inline MaximumMatching::~MaximumMatching() { /* code */ }
 
