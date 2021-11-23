@@ -116,7 +116,10 @@ inline void MaximumMatching::AddToU(Size u) {
   nec_index[size_U] = u;
 }
 
-inline void MaximumMatching::AddToV(Size v) { /* code */ }
+inline void MaximumMatching::AddToV(Size v) {
+  size_V += 1;
+  cand_to_v[v] = size_V;
+}
 
 inline bool MaximumMatching::IsAddedToV(Size v) { /* code */ }
 
