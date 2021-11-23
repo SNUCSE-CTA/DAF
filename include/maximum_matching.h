@@ -121,7 +121,7 @@ inline void MaximumMatching::AddToV(Size v) {
   cand_to_v[v] = size_V;
 }
 
-inline bool MaximumMatching::IsAddedToV(Size v) { /* code */ }
+inline bool MaximumMatching::IsAddedToV(Size v) { return cand_to_v[v] != -1; }
 
 inline void MaximumMatching::Clear(Size *nec_distinct_cands,
                                    Size *num_nec_distinct_cands) { /* code */ }
