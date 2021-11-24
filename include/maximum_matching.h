@@ -135,7 +135,45 @@ inline void MaximumMatching::Clear(Size *nec_distinct_cands,
   *num_nec_distinct_cands = 0;
 }
 
-inline bool MaximumMatching::BFS() { /* code */ }
+inline bool MaximumMatching::BFS() {
+  Size queue_start = 0;
+  Size queue_end = 0;
+
+  for (Size u = 1; u <= size_U; ++u) {
+    if (pair_U[u] == NIL) {
+      dist[u] = 0;
+      queue[queue_end++] = u;
+    } else {
+      dist[u] = INF;
+    }
+  }
+
+  dist[NIL] = INF;
+
+  while (queue_start != queue_end) {
+    Size u = queue[queue_start];
+    queue_start++;
+
+    if (dist[u] < dist[NIL]) {
+      Size j = nec_index[u];
+      Vertex represent = query_.GetNECElement(j).represent;
+      BacktrackHelper *helper = backtrack_helpers_ + represent;
+
+      for (Size k = 0; k < helper->GetNumExtendable(); k++) {
+        Vertex cand =
+            cs_.GetCandidate(represent, helper->GetExtendableIndex(k));
+        Size v = cand_to_v[cand];
+        if (dist[pair_V[v]] == INF) {
+          dist[pair_V[v]] = dist[u] + 1;
+
+          queue[queue_end++] = pair_V[v];
+        }
+      }
+    }
+  }
+
+  return (dist[NIL] != INF);
+}
 
 inline bool MaximumMatching::DFS(Size u) { /* code */ }
 }  // namespace daf
