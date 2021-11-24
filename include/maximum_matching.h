@@ -124,7 +124,16 @@ inline void MaximumMatching::AddToV(Size v) {
 inline bool MaximumMatching::IsAddedToV(Size v) { return cand_to_v[v] != -1; }
 
 inline void MaximumMatching::Clear(Size *nec_distinct_cands,
-                                   Size *num_nec_distinct_cands) { /* code */ }
+                                   Size *num_nec_distinct_cands) {
+  size_U = 0;
+  size_V = 0;
+
+  for (Size i = 0; i < *num_nec_distinct_cands; ++i) {
+    Vertex cand = nec_distinct_cands[i];
+    cand_to_v[cand] = -1;
+  }
+  *num_nec_distinct_cands = 0;
+}
 
 inline bool MaximumMatching::BFS() { /* code */ }
 
