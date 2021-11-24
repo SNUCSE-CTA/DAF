@@ -175,7 +175,30 @@ inline bool MaximumMatching::BFS() {
   return (dist[NIL] != INF);
 }
 
-inline bool MaximumMatching::DFS(Size u) { /* code */ }
+inline bool MaximumMatching::DFS(Size u) {
+  if (u != NIL) {
+    Size j = nec_index[u];
+    Vertex represent = query_.GetNECElement(j).represent;
+    BacktrackHelper *helper = backtrack_helpers_ + represent;
+
+    for (Size k = 0; k < helper->GetNumExtendable(); k++) {
+      Vertex cand = cs_.GetCandidate(represent, helper->GetExtendableIndex(k));
+      Size v = cand_to_v[cand];
+      if (dist[pair_V[v]] == dist[u] + 1) {
+        if (DFS(pair_V[v])) {
+          pair_V[v] = u;
+          pair_U[u] = v;
+          return true;
+        }
+      }
+    }
+
+    dist[u] = INF;
+    return false;
+  }
+
+  return true;
+}
 }  // namespace daf
 
 #endif  // MAXIMUM_MATCHING_H_
