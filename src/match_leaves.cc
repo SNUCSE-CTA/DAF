@@ -33,7 +33,19 @@ MatchLeaves::MatchLeaves(const DataGraph &data, const QueryGraph &query,
       new MaximumMatching(data_, query_, cs_, backtrack_helpers_);
 }
 
-MatchLeaves::~MatchLeaves() { /* code */ }
+MatchLeaves::~MatchLeaves() {
+  delete[] cand_to_nec_idx_;
+
+  delete[] nec_distinct_cands_;
+  delete[] nec_ranking_;
+  delete[] sum_nec_cands_size_;
+  delete[] sum_nec_size_;
+
+  delete[] num_remaining_cands_;
+  delete[] num_remaining_nec_vertices_;
+
+  delete maximum_matching_;
+}
 
 uint64_t MatchLeaves::Match(uint64_t limit) { /* code */ }
 
