@@ -410,7 +410,16 @@ uint64_t MatchLeaves::Combine() {
 }
 
 void MatchLeaves::ReserveVertex(Vertex represent,
-                                BacktrackHelper *repr_helper) { /* code */ }
+                                BacktrackHelper *repr_helper) {
+  repr_helper->GetMappingState() = RESERVED;
+  for (Size k = 0; k < repr_helper->GetNumExtendable(); ++k) {
+    Vertex cand =
+        cs_.GetCandidate(represent, repr_helper->GetExtendableIndex(k));
+
+    backtrack_mapped_query_vtx[cand] = represent;
+    reserved_data_vtx_.push_back(cand);
+  }
+}
 
 void MatchLeaves::ClearMemoryForBacktrack() { /* code */ }
 }  // namespace daf
