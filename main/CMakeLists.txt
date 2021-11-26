@@ -1,0 +1,1 @@
+add_executable(DAF main.cc ${SOURCES})
