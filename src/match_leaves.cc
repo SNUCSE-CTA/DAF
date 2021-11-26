@@ -421,5 +421,26 @@ void MatchLeaves::ReserveVertex(Vertex represent,
   }
 }
 
-void MatchLeaves::ClearMemoryForBacktrack() { /* code */ }
+void MatchLeaves::ClearMemoryForBacktrack() {
+  while (!reserved_data_vtx_.empty()) {
+    Vertex cand = reserved_data_vtx_.back();
+    reserved_data_vtx_.pop_back();
+    backtrack_mapped_query_vtx[cand] = -1;
+  }
+
+  for (Size i = 0; i < query_.GetNumNECLabel(); ++i) {
+    for (Size j = query_.GetNECStartOffset(i); j < query_.GetNECEndOffset(i);
+         ++j) {
+      Vertex represent = query_.GetNECElement(j).represent;
+      BacktrackHelper *repr_helper = backtrack_helpers_ + represent;
+
+      if (repr_helper->GetNumMappedNeighbors() > 0) {
+        repr_helper->GetMappingState() = UNMAPPED;
+        repr_helper->RemoveMapping();
+      } else {
+        return;
+      }
+    }
+  }
+}
 }  // namespace daf
