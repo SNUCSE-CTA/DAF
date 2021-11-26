@@ -291,7 +291,123 @@ EXIT:
   return result;
 }
 
-uint64_t MatchLeaves::Combine() { /* code */ }
+uint64_t MatchLeaves::Combine() {
+  uint64_t result = 0;
+
+  Size max_cand_idx = -1;
+  Size max_cand_size = 1;
+  // assert(query_.GetNECEndOffset(cur_label_idx) -
+  // query_.GetNECStartOffset(cur_label_idx) > 1);
+
+  for (Size j = 0; j < num_nec_distinct_cands_; ++j) {
+    Vertex cand = nec_distinct_cands_[j];
+    // assert(data_.GetLabel(cand) ==
+    //  query_.GetNECElement(query_.GetNECStartOffset(cur_label_idx)).label);
+
+    if (max_cand_size < cand_to_nec_idx_[cand].size()) {
+      max_cand_size = cand_to_nec_idx_[cand].size();
+      max_cand_idx = j;
+    }
+  }
+
+  if (max_cand_idx == -1) {
+    result = 1;
+    for (Size j = query_.GetNECStartOffset(cur_label_idx);
+         j < query_.GetNECEndOffset(cur_label_idx); ++j) {
+      for (Size k = 0; k < num_remaining_nec_vertices_[j]; ++k) {
+        result *= num_remaining_cands_[j] - k;
+      }
+    }
+    return result;
+  }
+
+  Vertex max_cand = nec_distinct_cands_[max_cand_idx];
+
+  std::swap(nec_distinct_cands_[max_cand_idx],
+            nec_distinct_cands_[num_nec_distinct_cands_ - 1]);
+
+  num_nec_distinct_cands_ -= 1;
+
+  backtrack_mapped_query_vtx[max_cand] = cur_label_idx;
+
+  for (Size j : cand_to_nec_idx_[max_cand]) {
+    num_remaining_cands_[j] -= 1;
+  }
+
+  std::sort(cand_to_nec_idx_[max_cand].begin(),
+            cand_to_nec_idx_[max_cand].end(), [this](Size j1, Size j2) -> bool {
+              return this->num_remaining_cands_[j1] <
+                     this->num_remaining_cands_[j2];
+            });
+
+  for (Size k = 0; k < cand_to_nec_idx_[max_cand].size(); ++k) {
+    Size j = cand_to_nec_idx_[max_cand][k];
+    // assert(num_remaining_nec_vertices_[j] >= 0);
+    // assert(num_remaining_cands_[j] >= 0);
+
+    if (num_remaining_nec_vertices_[j] == 0) continue;
+
+    std::swap(cand_to_nec_idx_[max_cand][k], cand_to_nec_idx_[max_cand].back());
+    cand_to_nec_idx_[max_cand].pop_back();
+    num_remaining_nec_vertices_[j] -= 1;
+
+    if (num_remaining_nec_vertices_[j] == 0) {
+      Vertex represent = query_.GetNECElement(j).represent;
+      BacktrackHelper *repr_helper = backtrack_helpers_ + represent;
+
+      for (Size k = 0; k < repr_helper->GetNumExtendable(); ++k) {
+        Vertex cand =
+            cs_.GetCandidate(represent, repr_helper->GetExtendableIndex(k));
+
+        if (backtrack_mapped_query_vtx[cand] == -1) {
+          for (auto &elem : cand_to_nec_idx_[cand]) {
+            if (elem == j) {
+              std::swap(elem, cand_to_nec_idx_[cand].back());
+              break;
+            }
+          }
+          // assert(cand_to_nec_idx_[cand].back() == j);
+
+          cand_to_nec_idx_[cand].pop_back();
+        }
+      }
+    }
+
+    uint64_t res = Combine();
+    result += (num_remaining_nec_vertices_[j] + 1) * res;
+
+    if (num_remaining_nec_vertices_[j] == 0) {
+      Vertex represent = query_.GetNECElement(j).represent;
+      BacktrackHelper *repr_helper = backtrack_helpers_ + represent;
+
+      for (Size k = 0; k < repr_helper->GetNumExtendable(); ++k) {
+        Vertex cand =
+            cs_.GetCandidate(represent, repr_helper->GetExtendableIndex(k));
+
+        if (backtrack_mapped_query_vtx[cand] == -1) {
+          cand_to_nec_idx_[cand].push_back(j);
+        }
+      }
+    }
+
+    cand_to_nec_idx_[max_cand].push_back(j);
+    std::swap(cand_to_nec_idx_[max_cand][k], cand_to_nec_idx_[max_cand].back());
+    num_remaining_nec_vertices_[j] += 1;
+  }
+
+  uint64_t res = Combine();
+  result += res;
+
+  for (Size j : cand_to_nec_idx_[max_cand]) {
+    num_remaining_cands_[j] += 1;
+  }
+
+  backtrack_mapped_query_vtx[max_cand] = -1;
+
+  num_nec_distinct_cands_ += 1;
+
+  return result;
+}
 
 void MatchLeaves::ReserveVertex(Vertex represent,
                                 BacktrackHelper *repr_helper) { /* code */ }
