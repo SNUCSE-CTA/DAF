@@ -81,7 +81,7 @@ void Graph::computeCoreNum() {
     bin[core_num_[v]] += 1;
   }
 
-  for (Size d = max_degree_; d > 0; --d) bin[d] = bin[d - 1];
+  for (Size d = max_degree_ + 1; d--;) bin[d] = bin[d - 1];
   bin[0] = 0;
 
   for (Size i = 0; i < GetNumVertices(); ++i) {

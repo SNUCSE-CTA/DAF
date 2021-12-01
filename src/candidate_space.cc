@@ -295,7 +295,7 @@ void CandidateSpace::ConstructCS() {
         }
       }
 
-      for (Size i = GetCandidateSetSize(u) - 1; i > 0; --i) {
+      for (Size i = GetCandidateSetSize(u); i--;) {
         candidate_offsets_[u * query_.GetMaxDegree() + u_adj_idx][i] =
             candidate_offsets_[u * query_.GetMaxDegree() + u_adj_idx][i - 1];
       }
