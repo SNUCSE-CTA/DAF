@@ -71,12 +71,12 @@ class BacktrackHelper {
   Vertex *lastly_mapped_neighbor_;
   MappingState mapping_state_;
 
-  Size degree_ = -1;
+  Size degree_ = INVALID_SZ;
 };
 inline BacktrackHelper::BacktrackHelper() {}
 
 inline BacktrackHelper::~BacktrackHelper() {
-  if (degree_ != -1) {
+  if (degree_ != INVALID_SZ) {
     delete[] ancestors_;
     delete[] num_extendable_indices_;
 
@@ -94,13 +94,13 @@ inline void BacktrackHelper::Initialize(Size num_query_vtx, Size degree,
   ancestors_ = new boost::dynamic_bitset<>[degree + 1];
   extendable_indices_ = new Size *[degree];
   num_extendable_indices_ = new Size[degree + 1];
-  lastly_mapped_neighbor_ = new Size[degree + 1];
+  lastly_mapped_neighbor_ = new Vertex[degree + 1];
   mapping_state_ = UNMAPPED;
 
   ancestors_[0].resize(num_query_vtx);
   ancestors_[0].set(u);
   num_extendable_indices_[0] = cs_size;
-  lastly_mapped_neighbor_[0] = -1;
+  lastly_mapped_neighbor_[0] = INVALID_VTX;
 
   for (Size i = 0; i < degree; ++i) {
     extendable_indices_[i] = new Size[cs_size];

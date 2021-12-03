@@ -32,7 +32,8 @@ CandidateSpace::CandidateSpace(const DataGraph &data, const QueryGraph &query,
       candidate_offsets_,
       candidate_offsets_ + query_.GetNumVertices() * query_.GetMaxDegree(),
       nullptr);
-  std::fill(cand_to_cs_idx_, cand_to_cs_idx_ + data_.GetNumVertices(), -1);
+  std::fill(cand_to_cs_idx_, cand_to_cs_idx_ + data_.GetNumVertices(),
+            INVALID_SZ);
 }
 
 CandidateSpace::~CandidateSpace() {
@@ -285,7 +286,7 @@ void CandidateSpace::ConstructCS() {
 
           Size v_idx = cand_to_cs_idx_[v];
 
-          if (v_idx != -1) {
+          if (v_idx != INVALID_SZ) {
             linear_cs_adj_list_[candidate_offsets_[u * query_.GetMaxDegree() +
                                                    u_adj_idx][v_idx]] =
                 v_adj_idx;
@@ -295,9 +296,9 @@ void CandidateSpace::ConstructCS() {
         }
       }
 
-      for (Size i = GetCandidateSetSize(u); i--;) {
-        candidate_offsets_[u * query_.GetMaxDegree() + u_adj_idx][i] =
-            candidate_offsets_[u * query_.GetMaxDegree() + u_adj_idx][i - 1];
+      for (Size i = GetCandidateSetSize(u) - 1; i--;) {
+        candidate_offsets_[u * query_.GetMaxDegree() + u_adj_idx][i + 1] =
+            candidate_offsets_[u * query_.GetMaxDegree() + u_adj_idx][i];
       }
 
       candidate_offsets_[u * query_.GetMaxDegree() + u_adj_idx][0] =
@@ -305,7 +306,7 @@ void CandidateSpace::ConstructCS() {
     }
 
     for (Size i = 0; i < candidate_set_size_[u]; ++i) {
-      cand_to_cs_idx_[candidate_set_[u][i]] = -1;
+      cand_to_cs_idx_[candidate_set_[u][i]] = INVALID_SZ;
     }
   }
 }
@@ -376,7 +377,7 @@ void CandidateSpace::AllocateSpaceForCS() {
           Vertex v = data_.GetNeighbor(i);
           if (data_.GetDegree(v) < u_degree) break;
 
-          if (cand_to_cs_idx_[v] != -1) {
+          if (cand_to_cs_idx_[v] != INVALID_SZ) {
             candidate_offsets_[u * query_.GetMaxDegree() + u_adj_idx]
                               [cand_to_cs_idx_[v] + 1] += 1;
           }
@@ -394,7 +395,7 @@ void CandidateSpace::AllocateSpaceForCS() {
     }
 
     for (Size i = 0; i < candidate_set_size_[u]; ++i) {
-      cand_to_cs_idx_[candidate_set_[u][i]] = -1;
+      cand_to_cs_idx_[candidate_set_[u][i]] = INVALID_SZ;
     }
   }
   linear_cs_adj_list_ = new Vertex[cur_cand_offset];

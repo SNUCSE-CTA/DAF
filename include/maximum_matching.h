@@ -27,7 +27,7 @@ class MaximumMatching {
 
   inline bool IsAddedToV(Size v);
 
-  inline void Clear(Size *nec_distinct_cands, Size *num_nec_distinct_cands);
+  inline void Clear(Vertex *nec_distinct_cands, Size *num_nec_distinct_cands);
 
  private:
   const DataGraph &data_;
@@ -78,7 +78,7 @@ inline MaximumMatching::MaximumMatching(const DataGraph &data,
   size_U = 0;
   size_V = 0;
 
-  std::fill(cand_to_v, cand_to_v + data_.GetNumVertices(), -1);
+  std::fill(cand_to_v, cand_to_v + data_.GetNumVertices(), INVALID_SZ);
 }
 
 inline MaximumMatching::~MaximumMatching() {
@@ -121,16 +121,18 @@ inline void MaximumMatching::AddToV(Size v) {
   cand_to_v[v] = size_V;
 }
 
-inline bool MaximumMatching::IsAddedToV(Size v) { return cand_to_v[v] != -1; }
+inline bool MaximumMatching::IsAddedToV(Size v) {
+  return cand_to_v[v] != INVALID_SZ;
+}
 
-inline void MaximumMatching::Clear(Size *nec_distinct_cands,
+inline void MaximumMatching::Clear(Vertex *nec_distinct_cands,
                                    Size *num_nec_distinct_cands) {
   size_U = 0;
   size_V = 0;
 
   for (Size i = 0; i < *num_nec_distinct_cands; ++i) {
     Vertex cand = nec_distinct_cands[i];
-    cand_to_v[cand] = -1;
+    cand_to_v[cand] = INVALID_SZ;
   }
   *num_nec_distinct_cands = 0;
 }

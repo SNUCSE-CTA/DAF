@@ -27,7 +27,7 @@ bool QueryGraph::LoadAndProcessGraph(const std::string &filename,
 
   label_frequency_ = new Size[data.GetNumLabels()];
   start_off_ = new Size[GetNumVertices() + 1];
-  linear_adj_list_ = new Size[GetNumEdges() * 2];
+  linear_adj_list_ = new Vertex[GetNumEdges() * 2];
   core_num_ = new Size[GetNumVertices()];
   std::fill(label_frequency_, label_frequency_ + data.GetNumLabels(), 0);
 
@@ -36,13 +36,12 @@ bool QueryGraph::LoadAndProcessGraph(const std::string &filename,
   // transfer label & construct adj list and label frequency
   for (Vertex v = 0; v < GetNumVertices(); ++v) {
     Label l = data.GetTransferredLabel(label_[v]);
-    if (l < 0) return false;
-    label_[v] = l;
-    if (l > max_label_) max_label_ = l;
+    if (l == INVALID_LB) return false;
     if (label_frequency_[l] == 0) num_label_ += 1;
+    label_[v] = l;
+    max_label_ = std::max(max_label_, l);
     label_frequency_[l] += 1;
-    if (static_cast<Size>(adj_list[v].size()) > max_degree_)
-      max_degree_ = adj_list[v].size();
+    if (adj_list[v].size() > max_degree_) max_degree_ = adj_list[v].size();
 
     start_off_[v] = cur_idx;
     core_num_[v] = adj_list[v].size();
@@ -86,7 +85,7 @@ void QueryGraph::ExtractResidualStructure() {
 
   Size num_NEC_elems_ = 0;
 
-  std::fill(NEC_map_, NEC_map_ + GetNumVertices(), -1);
+  std::fill(NEC_map_, NEC_map_ + GetNumVertices(), INVALID_VTX);
   std::fill(NEC_size_, NEC_size_ + GetNumVertices(), 0);
 
   num_non_leaf_vertices_ = GetNumVertices();

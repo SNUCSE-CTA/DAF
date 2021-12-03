@@ -55,8 +55,8 @@ void DataGraph::LoadAndProcessGraph(const std::string& filename) {
   max_label_frequency_ = 0;
 
   transferred_label_ = new Label[max_label + 1];
-  // transferred_label_[l] = -1 iff there is no label l in data graph
-  std::fill(transferred_label_, transferred_label_ + max_label + 1, -1);
+  // transferred_label_[l] = INVALID_LB iff there is no label l in data graph
+  std::fill(transferred_label_, transferred_label_ + max_label + 1, INVALID_LB);
 
   for (auto p : transferred_label_map) {
     transferred_label_[p.first] = p.second;
@@ -99,8 +99,7 @@ void DataGraph::LoadAndProcessGraph(const std::string& filename) {
 
     // initialize core number
     core_num_[v] = adj_list[v].size();
-    if (static_cast<Size>(adj_list[v].size()) > max_degree_)
-      max_degree_ = adj_list[v].size();
+    if (adj_list[v].size() > max_degree_) max_degree_ = adj_list[v].size();
 
     if (adj_list[v].size() == 0) {
       continue;
@@ -119,13 +118,12 @@ void DataGraph::LoadAndProcessGraph(const std::string& filename) {
     Label cur_adj_label = GetLabel(adj_list[v][0]);
     adj_offs_by_label_[start + cur_adj_label].first = cur_idx;
     max_nbr_degree_[v] = adj_list[adj_list[v][0]].size();
-    for (Size i = 1; i < static_cast<Size>(adj_list[v].size()); ++i) {
+    for (Size i = 1; i < adj_list[v].size(); ++i) {
       if (cur_adj_label != GetLabel(adj_list[v][i])) {
         linear_nbr_bitset_[nbr_bitset_size_ * v +
                            (cur_adj_label / (sizeof(uint64_t) * CHAR_BIT))] |=
             1ull << (cur_adj_label % (sizeof(uint64_t) * CHAR_BIT));
-        if (max_nbr_degree_[v] <
-            static_cast<Size>(adj_list[adj_list[v][i]].size()))
+        if (max_nbr_degree_[v] < adj_list[adj_list[v][i]].size())
           max_nbr_degree_[v] = adj_list[adj_list[v][i]].size();
         adj_offs_by_label_[start + cur_adj_label].second = cur_idx + i;
         cur_adj_label = GetLabel(adj_list[v][i]);

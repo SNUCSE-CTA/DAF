@@ -24,7 +24,8 @@ Backtrack::Backtrack(const DataGraph &data, const QueryGraph &query,
     match_leaves_ = nullptr;
   }
 
-  std::fill(mapped_query_vtx_, mapped_query_vtx_ + data_.GetNumVertices(), -1);
+  std::fill(mapped_query_vtx_, mapped_query_vtx_ + data_.GetNumVertices(),
+            INVALID_VTX);
 
   for (Vertex u = 0; u < query_.GetNumVertices(); ++u) {
     helpers_[u].Initialize(query_.GetNumVertices(), query_.GetDegree(u),
@@ -52,7 +53,7 @@ uint64_t Backtrack::FindMatches(uint64_t limit) {
 
   InitializeNodeStack();
 
-  while (backtrack_depth_ >= 0) {
+  while (backtrack_depth_ != INVALID_SZ) {
     if (num_embeddings_ >= limit) {
       return num_embeddings_;
     }
@@ -104,7 +105,7 @@ uint64_t Backtrack::FindMatches(uint64_t limit) {
       Size cs_v_idx = u_helper->GetExtendableIndex(cur_node->v_idx);
       cur_node->v = cs_.GetCandidate(cur_node->u, cs_v_idx);
 
-      if (mapped_query_vtx_[cur_node->v] == -1) {
+      if (mapped_query_vtx_[cur_node->v] == INVALID_VTX) {
         bool success = ComputeExtendableForAllNeighbors(cur_node, cs_v_idx);
 
         if (!success) {
@@ -147,7 +148,10 @@ uint64_t Backtrack::FindMatches(uint64_t limit) {
       u_helper->GetMappingState() = UNMAPPED;
       cur_node->initialized = false;
 
-      backtrack_depth_ -= 1;
+      if (backtrack_depth_ != 0)
+        backtrack_depth_ -= 1;
+      else
+        backtrack_depth_ = INVALID_SZ;
     }
   }
 
@@ -299,6 +303,6 @@ void Backtrack::ReleaseNeighbors(SearchTreeNode *cur_node) {
       }
     }
   }
-  mapped_query_vtx_[cur_node->v] = -1;
+  mapped_query_vtx_[cur_node->v] = INVALID_VTX;
 }
 }  // namespace daf

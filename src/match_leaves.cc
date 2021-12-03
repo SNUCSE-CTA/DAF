@@ -81,7 +81,7 @@ uint64_t MatchLeaves::Match(uint64_t limit) {
            ++i) {
         Size v_idx = cs_.GetCandidateIndex(i);
         Vertex v = cs_.GetCandidate(represent, v_idx);
-        if (backtrack_mapped_query_vtx[v] == -1) {
+        if (backtrack_mapped_query_vtx[v] == INVALID_VTX) {
           extendable_indices[num_extendable] = v_idx;
           num_extendable += 1;
         }
@@ -120,8 +120,6 @@ uint64_t MatchLeaves::Match(uint64_t limit) {
     for (Size j = start_offset; j < end_offset; ++j) {
       const NECElement &nec = query_.GetNECElement(j);
 
-      // assert(label == nec.label);
-
       Vertex represent = nec.represent;
       Size size = nec.size;
 
@@ -139,9 +137,7 @@ uint64_t MatchLeaves::Match(uint64_t limit) {
         Vertex cand =
             cs_.GetCandidate(represent, repr_helper->GetExtendableIndex(k));
 
-        // assert(cand >= 0 && cand < data_.GetNumVertices());
-
-        if (backtrack_mapped_query_vtx[cand] == -1) {
+        if (backtrack_mapped_query_vtx[cand] == INVALID_VTX) {
           if (maximum_matching_->IsAddedToV(cand) == false) {
             maximum_matching_->AddToV(cand);
             nec_distinct_cands_[num_nec_distinct_cands_] = cand;
@@ -218,13 +214,11 @@ uint64_t MatchLeaves::Match(uint64_t limit) {
 
         if (repr_helper->GetMappingState() == RESERVED) continue;
 
-        // assert(repr_helper->GetNumExtendable() >= nec.size);
-
         for (Size k = 0; k < repr_helper->GetNumExtendable(); ++k) {
           Vertex cand =
               cs_.GetCandidate(represent, repr_helper->GetExtendableIndex(k));
 
-          if (backtrack_mapped_query_vtx[cand] != -1) {
+          if (backtrack_mapped_query_vtx[cand] != INVALID_VTX) {
             std::swap(
                 repr_helper->GetExtendableIndices()[k],
                 repr_helper
@@ -272,7 +266,6 @@ uint64_t MatchLeaves::Match(uint64_t limit) {
     }
 
     result *= Combine();
-    // assert(result != 0);
 
     for (Size k = 0; k < num_nec_distinct_cands_; ++k) {
       Vertex cand = nec_distinct_cands_[k];
@@ -294,15 +287,11 @@ EXIT:
 uint64_t MatchLeaves::Combine() {
   uint64_t result = 0;
 
-  Size max_cand_idx = -1;
+  Size max_cand_idx = INVALID_SZ;
   Size max_cand_size = 1;
-  // assert(query_.GetNECEndOffset(cur_label_idx) -
-  // query_.GetNECStartOffset(cur_label_idx) > 1);
 
   for (Size j = 0; j < num_nec_distinct_cands_; ++j) {
     Vertex cand = nec_distinct_cands_[j];
-    // assert(data_.GetLabel(cand) ==
-    //  query_.GetNECElement(query_.GetNECStartOffset(cur_label_idx)).label);
 
     if (max_cand_size < cand_to_nec_idx_[cand].size()) {
       max_cand_size = cand_to_nec_idx_[cand].size();
@@ -310,7 +299,7 @@ uint64_t MatchLeaves::Combine() {
     }
   }
 
-  if (max_cand_idx == -1) {
+  if (max_cand_idx == INVALID_SZ) {
     result = 1;
     for (Size j = query_.GetNECStartOffset(cur_label_idx);
          j < query_.GetNECEndOffset(cur_label_idx); ++j) {
@@ -342,8 +331,6 @@ uint64_t MatchLeaves::Combine() {
 
   for (Size k = 0; k < cand_to_nec_idx_[max_cand].size(); ++k) {
     Size j = cand_to_nec_idx_[max_cand][k];
-    // assert(num_remaining_nec_vertices_[j] >= 0);
-    // assert(num_remaining_cands_[j] >= 0);
 
     if (num_remaining_nec_vertices_[j] == 0) continue;
 
@@ -359,14 +346,13 @@ uint64_t MatchLeaves::Combine() {
         Vertex cand =
             cs_.GetCandidate(represent, repr_helper->GetExtendableIndex(k));
 
-        if (backtrack_mapped_query_vtx[cand] == -1) {
+        if (backtrack_mapped_query_vtx[cand] == INVALID_VTX) {
           for (auto &elem : cand_to_nec_idx_[cand]) {
             if (elem == j) {
               std::swap(elem, cand_to_nec_idx_[cand].back());
               break;
             }
           }
-          // assert(cand_to_nec_idx_[cand].back() == j);
 
           cand_to_nec_idx_[cand].pop_back();
         }
@@ -384,7 +370,7 @@ uint64_t MatchLeaves::Combine() {
         Vertex cand =
             cs_.GetCandidate(represent, repr_helper->GetExtendableIndex(k));
 
-        if (backtrack_mapped_query_vtx[cand] == -1) {
+        if (backtrack_mapped_query_vtx[cand] == INVALID_VTX) {
           cand_to_nec_idx_[cand].push_back(j);
         }
       }
@@ -402,7 +388,7 @@ uint64_t MatchLeaves::Combine() {
     num_remaining_cands_[j] += 1;
   }
 
-  backtrack_mapped_query_vtx[max_cand] = -1;
+  backtrack_mapped_query_vtx[max_cand] = INVALID_VTX;
 
   num_nec_distinct_cands_ += 1;
 
@@ -425,7 +411,7 @@ void MatchLeaves::ClearMemoryForBacktrack() {
   while (!reserved_data_vtx_.empty()) {
     Vertex cand = reserved_data_vtx_.back();
     reserved_data_vtx_.pop_back();
-    backtrack_mapped_query_vtx[cand] = -1;
+    backtrack_mapped_query_vtx[cand] = INVALID_VTX;
   }
 
   for (Size i = 0; i < query_.GetNumNECLabel(); ++i) {
