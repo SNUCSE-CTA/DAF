@@ -1,14 +1,12 @@
 #include "include/backtrack.h"
 
-#include <iostream>
-
 namespace daf {
 Backtrack::Backtrack(const DataGraph &data, const QueryGraph &query,
                      const CandidateSpace &cs)
     : data_(data), query_(query), cs_(cs) {
   num_embeddings_ = 0;
   num_backtrack_calls_ = 0;
-  backtrack_depth_ = 0;
+  backtrack_depth_ = 1;
 
   mapped_query_vtx_ = new Vertex[data_.GetNumVertices()];
   node_stack_ = new SearchTreeNode[query_.GetNumNonLeafVertices() + 1];
@@ -53,13 +51,13 @@ uint64_t Backtrack::FindMatches(uint64_t limit) {
 
   InitializeNodeStack();
 
-  while (backtrack_depth_ != INVALID_SZ) {
+  while (backtrack_depth_ > 0) {
     if (num_embeddings_ >= limit) {
       return num_embeddings_;
     }
 
-    SearchTreeNode *parent_node = node_stack_ + backtrack_depth_;
-    SearchTreeNode *cur_node = node_stack_ + backtrack_depth_ + 1;
+    SearchTreeNode *parent_node = node_stack_ + (backtrack_depth_ - 1);
+    SearchTreeNode *cur_node = node_stack_ + backtrack_depth_;
 
     BacktrackHelper *u_helper;
 
@@ -111,7 +109,7 @@ uint64_t Backtrack::FindMatches(uint64_t limit) {
         if (!success) {
           // go to sibling node (need to compute failing set of parent node)
           break;
-        } else if (backtrack_depth_ + 1 == query_.GetNumNonLeafVertices()) {
+        } else if (backtrack_depth_ == query_.GetNumNonLeafVertices()) {
           // embedding class
           uint64_t num_cur_embeddings;
 
@@ -148,10 +146,7 @@ uint64_t Backtrack::FindMatches(uint64_t limit) {
       u_helper->GetMappingState() = UNMAPPED;
       cur_node->initialized = false;
 
-      if (backtrack_depth_ != 0)
-        backtrack_depth_ -= 1;
-      else
-        backtrack_depth_ = INVALID_SZ;
+      backtrack_depth_ -= 1;
     }
   }
 
@@ -191,14 +186,19 @@ void Backtrack::ComputeExtendable(Vertex u, Vertex u_nbr, Size u_nbr_idx,
 
   Size *extendable_indices = u_nbr_helper->GetExtendableIndices();
   Size &num_extendable = u_nbr_helper->GetNumExtendable();
+  Size &num_unmapped_extendable = u_nbr_helper->GetNumUnmappedExtendable();
 
   if (u_nbr_helper->GetNumMappedNeighbors() == 1) {
     for (Size i = cs_.GetCandidateStartOffset(u, u_nbr_idx, cs_v_idx);
          i < cs_.GetCandidateEndOffset(u, u_nbr_idx, cs_v_idx); ++i) {
       Size v_nbr_idx = cs_.GetCandidateIndex(i);
+      Vertex v_nbr = cs_.GetCandidate(u_nbr, v_nbr_idx);
 
       extendable_indices[num_extendable] = v_nbr_idx;
       num_extendable += 1;
+      if (mapped_query_vtx_[v_nbr] == INVALID_VTX) {
+        num_unmapped_extendable += 1;
+      }
     }
   } else {
     // intersection
@@ -216,8 +216,14 @@ void Backtrack::ComputeExtendable(Vertex u, Vertex u_nbr, Size u_nbr_idx,
       Size vj = cs_.GetCandidateIndex(j);
 
       if (vi == vj) {
+        Vertex v_nbr = cs_.GetCandidate(u_nbr, vi);
+
         extendable_indices[num_extendable] = vi;
         num_extendable += 1;
+
+        if (mapped_query_vtx_[v_nbr] == INVALID_VTX) {
+          num_unmapped_extendable += 1;
+        }
 
         i += 1;
         j += 1;
@@ -250,7 +256,8 @@ bool Backtrack::ComputeExtendableForAllNeighbors(SearchTreeNode *cur_node,
 
     BacktrackHelper *u_nbr_helper = helpers_ + u_nbr;
 
-    if (u_nbr_helper->GetMappingState() == MAPPED || query_.IsInNEC(u_nbr))
+    if (u_nbr_helper->GetMappingState() == MAPPED ||
+        (query_.IsInNEC(u_nbr) && !query_.IsNECRepresentation(u_nbr)))
       continue;
 
     u_nbr_helper->AddMapping(cur_node->u);
@@ -259,6 +266,7 @@ bool Backtrack::ComputeExtendableForAllNeighbors(SearchTreeNode *cur_node,
     ComputeDynamicAncestor(cur_node->u, u_nbr);
 
     Size num_extendable = u_nbr_helper->GetNumExtendable();
+    Size num_unmapped_extendable = u_nbr_helper->GetNumUnmappedExtendable();
 
     if (!query_.IsInNEC(u_nbr)) {
       if (u_nbr_helper->GetNumMappedNeighbors() == 1) {
@@ -268,9 +276,19 @@ bool Backtrack::ComputeExtendableForAllNeighbors(SearchTreeNode *cur_node,
       }
     }
 
-    if (num_extendable == 0) {
+    if (num_unmapped_extendable == 0) {
       // compute failing set (emptyset class)
       cur_node->failing_set = u_nbr_helper->GetAncestor();
+
+      for (Size i = 0; i < num_extendable; ++i) {
+        Vertex v_nbr =
+            cs_.GetCandidate(u_nbr, u_nbr_helper->GetExtendableIndex(i));
+        // conflict class
+        Vertex u_nbr_conflict = mapped_query_vtx_[v_nbr];
+        BacktrackHelper *u_nbr_conflict_helper = helpers_ + u_nbr_conflict;
+        cur_node->failing_set |= u_nbr_conflict_helper->GetAncestor();
+      }
+
       return false;
     }
   }
@@ -286,10 +304,11 @@ void Backtrack::ReleaseNeighbors(SearchTreeNode *cur_node) {
 
     BacktrackHelper *u_nbr_helper = helpers_ + u_nbr;
 
-    if (u_nbr_helper->GetMappingState() == MAPPED || query_.IsInNEC(u_nbr))
+    if (u_nbr_helper->GetMappingState() == MAPPED ||
+        (query_.IsInNEC(u_nbr) && !query_.IsNECRepresentation(u_nbr)))
       continue;
 
-    if (u_nbr_helper->GetLastlyMappedNeighbor() != cur_node->u) break;
+    if (u_nbr_helper->GetLastMappedNeighbor() != cur_node->u) break;
 
     Size num_prev_extendable = u_nbr_helper->GetNumPrevExtendable();
 

@@ -1,6 +1,8 @@
 #ifndef DAG_H_
 #define DAG_H_
 
+#include <algorithm>
+
 #include "global/global.h"
 #include "include/data_graph.h"
 #include "include/query_graph.h"

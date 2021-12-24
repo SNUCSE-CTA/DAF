@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "global/global.h"
 #include "include/graph.h"
@@ -13,13 +14,13 @@
 namespace daf {
 class DataGraph : public Graph {
  public:
-  DataGraph();
+  explicit DataGraph(const std::string& filename);
   ~DataGraph();
 
   DataGraph& operator=(const DataGraph&) = delete;
   DataGraph(const DataGraph&) = delete;
 
-  void LoadAndProcessGraph(const std::string& filename);
+  void LoadAndProcessGraph();
 
   using Graph::GetEndOffset;
   using Graph::GetStartOffset;

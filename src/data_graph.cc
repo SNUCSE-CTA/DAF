@@ -1,11 +1,7 @@
 #include "include/data_graph.h"
 
-#include <algorithm>
-#include <unordered_map>
-#include <vector>
-
 namespace daf {
-DataGraph::DataGraph() {}
+DataGraph::DataGraph(const std::string& filename) : Graph(filename) {}
 
 DataGraph::~DataGraph() {
   delete[] transferred_label_;
@@ -16,12 +12,12 @@ DataGraph::~DataGraph() {
   delete[] max_nbr_degree_;
 }
 
-void DataGraph::LoadAndProcessGraph(const std::string& filename) {
+void DataGraph::LoadAndProcessGraph() {
   std::vector<std::vector<Vertex>> adj_list;
   std::unordered_map<Label, Label> transferred_label_map;
   Label max_label = 0;
 
-  LoadRoughGraph(filename, &adj_list);
+  LoadRoughGraph(&adj_list);
 
   // transfer label & get sorted degrees (for constructing C_ini(u))
   Label cur_transferred_label = 0;

@@ -1,6 +1,8 @@
 #ifndef GRAPH_H_
 #define GRAPH_H_
 
+#include <fstream>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -11,7 +13,7 @@ namespace daf {
 
 class Graph {
  public:
-  Graph();
+  explicit Graph(const std::string& filename);
   ~Graph();
 
   Graph& operator=(const Graph&) = delete;
@@ -33,8 +35,7 @@ class Graph {
   inline Vertex GetNeighbor(Size i) const;
 
  protected:
-  void LoadRoughGraph(const std::string& filename,
-                      std::vector<std::vector<Vertex>>* graph);
+  void LoadRoughGraph(std::vector<std::vector<Vertex>>* graph);
   void computeCoreNum();
 
   Size num_vertex_;
@@ -49,6 +50,9 @@ class Graph {
   Size* label_frequency_;
 
   Size* core_num_;
+
+  const std::string& filename_;
+  std::ifstream fin_;
 };
 
 inline Size Graph::GetNumLabels() const { return num_label_; }

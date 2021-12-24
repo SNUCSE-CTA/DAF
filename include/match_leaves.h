@@ -39,6 +39,7 @@ class MatchLeaves {
   Size num_nec_distinct_cands_;
   std::vector<Size> *cand_to_nec_idx_;
   std::vector<Vertex> reserved_data_vtx_;
+  std::vector<Vertex> reserved_query_vtx_;
 
   Size *num_remaining_nec_vertices_;
   Size *num_remaining_cands_;

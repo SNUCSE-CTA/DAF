@@ -7,8 +7,7 @@
 namespace daf {
 class Timer {
  public:
-  Timer() : time(0.0) { /* code */
-  }
+  Timer() : time(0.0) {}
   ~Timer() {}
 
   void Start() { s = std::chrono::high_resolution_clock::now(); }

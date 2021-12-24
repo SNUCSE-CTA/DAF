@@ -1,10 +1,8 @@
 #include "include/graph.h"
 
-#include <fstream>
-#include <iostream>
-
 namespace daf {
-Graph::Graph() {}
+Graph::Graph(const std::string &filename)
+    : filename_(filename), fin_(filename) {}
 
 Graph::~Graph() {
   delete[] start_off_;
@@ -14,19 +12,16 @@ Graph::~Graph() {
   delete[] core_num_;
 }
 
-void Graph::LoadRoughGraph(const std::string &filename,
-                           std::vector<std::vector<Vertex>> *graph) {
-  std::ifstream fin(filename);
-
-  if (!fin.is_open()) {
-    std::cerr << "Graph file " << filename << " not found!\n";
+void Graph::LoadRoughGraph(std::vector<std::vector<Vertex>> *graph) {
+  if (!fin_.is_open()) {
+    std::cerr << "Graph file " << filename_ << " not found!\n";
     exit(EXIT_FAILURE);
   }
 
   Size v, e;
   char type;
 
-  fin >> type >> v >> e;
+  fin_ >> type >> v >> e;
 
   num_vertex_ = v;
   num_edge_ = e;
@@ -35,24 +30,23 @@ void Graph::LoadRoughGraph(const std::string &filename,
   graph->resize(v);
 
   // preprocessing
-  while (fin >> type) {
+  while (fin_ >> type) {
     if (type == 'v') {
       Vertex id;
       Label l;
-      Size d;
-      fin >> id >> l >> d;
+      fin_ >> id >> l;
 
       label_[id] = l;
     } else if (type == 'e') {
       Vertex v1, v2;
-      fin >> v1 >> v2;
+      fin_ >> v1 >> v2;
 
       (*graph)[v1].push_back(v2);
       (*graph)[v2].push_back(v1);
     }
   }
 
-  fin.close();
+  fin_.close();
 }
 
 void Graph::computeCoreNum() {

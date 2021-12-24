@@ -38,10 +38,12 @@ class CandidateSpace {
   Size **candidate_offsets_;
   Vertex *linear_cs_adj_list_;
 
-  Size *num_visit_cs_;
+  QueryDegree *num_visit_cs_;
   Vertex *visited_candidates_;
   Size *cand_to_cs_idx_;
   Size num_visitied_candidates_;
+
+  Size num_cs_edges_;
 
   bool FilterByTopDownWithInit();
   bool FilterByBottomUp();
@@ -49,7 +51,6 @@ class CandidateSpace {
 
   void ConstructCS();
   bool InitRootCandidates();
-  void AllocateSpaceForCS();
 
   void ComputeNbrInformation(Vertex u, Size *max_nbr_degree,
                              uint64_t *label_set);

@@ -24,6 +24,7 @@ class Backtrack {
   Backtrack(const Backtrack &) = delete;
 
   uint64_t FindMatches(uint64_t limit);
+  inline uint64_t GetNumBacktrackCalls() const;
 
  private:
   const DataGraph &data_;
@@ -32,11 +33,11 @@ class Backtrack {
 
   Ordering *extendable_queue_;
   MatchLeaves *match_leaves_;
+  BacktrackHelper *helpers_;
 
   Vertex *mapped_query_vtx_;
   SearchTreeNode *node_stack_;
   SearchTreeNode **mapped_nodes_;
-  BacktrackHelper *helpers_;
 
   uint64_t num_embeddings_;
   uint64_t num_backtrack_calls_;
@@ -50,6 +51,11 @@ class Backtrack {
                                         Size cs_v_idx);
   void ReleaseNeighbors(SearchTreeNode *cur_node);
 };
+
+inline uint64_t Backtrack::GetNumBacktrackCalls() const {
+  return num_backtrack_calls_;
+}
+
 }  // namespace daf
 
 #endif  // BACKTRACK_H_

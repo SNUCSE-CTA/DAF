@@ -1,7 +1,5 @@
 #include "include/dag.h"
 
-#include <algorithm>
-
 namespace daf {
 DAG::DAG(const DataGraph &data, const QueryGraph &query)
     : data_(data), query_(query) {
@@ -56,28 +54,23 @@ void DAG::BuildDAG() {
   Size end = 1;
 
   while (begin < end) {
-    /**
-     * REVIEW
-     * sort by,
-     * (1) label frequency in data_ graph (decreasing order?)
-     * (2) label (any order, to group by label)
-     * (3) degree in query_ graph (decreasing order)
-     */
     std::sort(bfs_sequence_ + begin, bfs_sequence_ + end,
               [this](Vertex v1, Vertex v2) -> bool {
                 Size d1 = query_.GetDegree(v1);
                 Size d2 = query_.GetDegree(v2);
-                Label l1 = query_.GetLabel(v1);
-                Label l2 = query_.GetLabel(v2);
-                Size lf1 = data_.GetLabelFrequency(l1);
-                Size lf2 = data_.GetLabelFrequency(l2);
-                if (lf1 != lf2) return lf1 < lf2;
-                if (d1 != d2) return d1 > d2;
-                return l1 < l2;
+                return d1 > d2;
               });
+    std::stable_sort(bfs_sequence_ + begin, bfs_sequence_ + end,
+                     [this](Vertex v1, Vertex v2) -> bool {
+                       Label l1 = query_.GetLabel(v1);
+                       Label l2 = query_.GetLabel(v2);
+                       Size lf1 = data_.GetLabelFrequency(l1);
+                       Size lf2 = data_.GetLabelFrequency(l2);
+                       if (lf1 != lf2) return lf1 < lf2;
+                       return l1 < l2;
+                     });
 
     Size cur_level_end = end;
-
     while (begin < cur_level_end) {
       Vertex parent = bfs_sequence_[begin];
 
@@ -114,14 +107,12 @@ void DAG::BuildDAG() {
 Vertex DAG::SelectRootVertex() {
   Vertex root = 0;
   double min_rank = std::numeric_limits<double>::max();
-
   for (Vertex v = 0; v < query_.GetNumVertices(); ++v) {
     Label l = query_.GetLabel(v);
     Size d = query_.GetDegree(v);
     init_cand_size_[v] = data_.GetInitCandSize(l, d);
 
     if (query_.GetCoreNum(v) < 2 && !query_.IsTree()) continue;
-    if (query_.IsInNEC(v) && !query_.IsNECRepresentation(v)) continue;
 
     double rank =
         static_cast<double>(init_cand_size_[v]) / static_cast<double>(d);

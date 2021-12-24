@@ -11,6 +11,7 @@ namespace daf {
 using Size = uint32_t;
 using Vertex = uint32_t;
 using Label = uint32_t;
+using QueryDegree = uint8_t;
 
 constexpr Size INVALID_SZ = std::numeric_limits<Size>::max();
 constexpr Vertex INVALID_VTX = std::numeric_limits<Vertex>::max();

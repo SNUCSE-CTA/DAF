@@ -1,6 +1,9 @@
 #ifndef QUERY_GRAPH_H_
 #define QUERY_GRAPH_H_
 
+#include <algorithm>
+#include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -12,13 +15,13 @@ struct NECElement;
 
 class QueryGraph : public Graph {
  public:
-  QueryGraph();
+  explicit QueryGraph(const std::string &filename);
   ~QueryGraph();
 
   QueryGraph &operator=(const QueryGraph &) = delete;
   QueryGraph(const QueryGraph &) = delete;
 
-  bool LoadAndProcessGraph(const std::string &filename, const DataGraph &data);
+  bool LoadAndProcessGraph(const DataGraph &data);
 
   inline bool IsNECRepresentation(Vertex v) const;
   inline bool IsInNEC(Vertex v) const;

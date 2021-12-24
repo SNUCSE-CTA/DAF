@@ -1,12 +1,7 @@
 #include "include/query_graph.h"
 
-#include <algorithm>
-#include <fstream>
-#include <iostream>
-#include <vector>
-
 namespace daf {
-QueryGraph::QueryGraph() {}
+QueryGraph::QueryGraph(const std::string &filename) : Graph(filename) {}
 QueryGraph::~QueryGraph() {
   delete[] NEC_map_;
   delete[] NEC_elems_;
@@ -15,11 +10,10 @@ QueryGraph::~QueryGraph() {
   delete[] NEC_size_;
 }
 
-bool QueryGraph::LoadAndProcessGraph(const std::string &filename,
-                                     const DataGraph &data) {
+bool QueryGraph::LoadAndProcessGraph(const DataGraph &data) {
   std::vector<std::vector<Vertex>> adj_list;
 
-  LoadRoughGraph(filename, &adj_list);
+  LoadRoughGraph(&adj_list);
 
   max_degree_ = 0;
   num_label_ = 0;
@@ -72,7 +66,7 @@ bool QueryGraph::LoadAndProcessGraph(const std::string &filename,
 namespace {
 struct NECInfo {
   bool visit = false;
-  Vertex representation;
+  Vertex representative;
   Size NEC_elems_idx;
 };
 }  // namespace
@@ -112,9 +106,9 @@ void QueryGraph::ExtractResidualStructure() {
         }
         num_NEC_elems_ += 1;
       } else {
-        NEC_map_[v] = info.representation;
+        NEC_map_[v] = info.representative;
       }
-      NEC_size_[info.representation] += 1;
+      NEC_size_[info.representative] += 1;
       NEC_elems_[info.NEC_elems_idx].size += 1;
       num_non_leaf_vertices_ -= 1;
     } else {

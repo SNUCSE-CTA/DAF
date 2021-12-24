@@ -61,41 +61,32 @@ uint64_t MatchLeaves::Match(uint64_t limit) {
       Vertex represent = nec.represent;
       Size size = nec.size;
 
-      Vertex repr_nbr = nec.adjacent;
-
       BacktrackHelper *repr_helper = backtrack_helpers_ + represent;
-      BacktrackHelper *repr_nbr_helper = backtrack_helpers_ + repr_nbr;
 
-      repr_helper->AddMapping(repr_nbr);
+      repr_helper->GetNumUnmappedExtendable() = repr_helper->GetNumExtendable();
 
-      Size *extendable_indices = repr_helper->GetExtendableIndices();
-      Size &num_extendable = repr_helper->GetNumExtendable();
+      for (Size k = 0; k < repr_helper->GetNumUnmappedExtendable(); ++k) {
+        Vertex cand =
+            cs_.GetCandidate(represent, repr_helper->GetExtendableIndex(k));
 
-      SearchTreeNode *nbr_node = backtrack_mapped_nodes_[repr_nbr];
-
-      Size cs_idx = repr_nbr_helper->GetExtendableIndex(nbr_node->v_idx);
-
-      for (Size i =
-               cs_.GetCandidateStartOffset(repr_nbr, nec.represent_idx, cs_idx);
-           i < cs_.GetCandidateEndOffset(repr_nbr, nec.represent_idx, cs_idx);
-           ++i) {
-        Size v_idx = cs_.GetCandidateIndex(i);
-        Vertex v = cs_.GetCandidate(represent, v_idx);
-        if (backtrack_mapped_query_vtx[v] == INVALID_VTX) {
-          extendable_indices[num_extendable] = v_idx;
-          num_extendable += 1;
+        if (backtrack_mapped_query_vtx[cand] != INVALID_VTX) {
+          std::swap(repr_helper->GetExtendableIndices()[k],
+                    repr_helper->GetExtendableIndices()
+                        [repr_helper->GetNumUnmappedExtendable() - 1]);
+          repr_helper->GetNumUnmappedExtendable() -= 1;
+          k -= 1;
         }
       }
 
-      if (num_extendable < size) {
+      if (repr_helper->GetNumUnmappedExtendable() < size) {
         result = 0;
         goto EXIT;
       } else {
         if (end_offset - start_offset == 1) {
           for (Size j = 0; j < nec.size; ++j) {
-            result *= num_extendable - j;
+            result *= repr_helper->GetNumUnmappedExtendable() - j;
           }
-        } else if (num_extendable == size) {
+        } else if (repr_helper->GetNumUnmappedExtendable() == size) {
           ReserveVertex(represent, repr_helper);
           result *= Factorial(size);
         }
@@ -133,7 +124,7 @@ uint64_t MatchLeaves::Match(uint64_t limit) {
 
       sum_nec_size_[i] += size;
 
-      for (Size k = 0; k < repr_helper->GetNumExtendable(); ++k) {
+      for (Size k = 0; k < repr_helper->GetNumUnmappedExtendable(); ++k) {
         Vertex cand =
             cs_.GetCandidate(represent, repr_helper->GetExtendableIndex(k));
 
@@ -145,27 +136,22 @@ uint64_t MatchLeaves::Match(uint64_t limit) {
             num_nec_distinct_cands_ += 1;
           }
         } else {
-          std::swap(
-              repr_helper->GetExtendableIndices()[k],
-              repr_helper
-                  ->GetExtendableIndices()[repr_helper->GetNumExtendable() -
-                                           1]);
-          repr_helper->GetNumExtendable() -= 1;
+          std::swap(repr_helper->GetExtendableIndices()[k],
+                    repr_helper->GetExtendableIndices()
+                        [repr_helper->GetNumUnmappedExtendable() - 1]);
+          repr_helper->GetNumUnmappedExtendable() -= 1;
           k -= 1;
         }
       }
 
-      sum_nec_cands_size_[i] += repr_helper->GetNumExtendable();
+      sum_nec_cands_size_[i] += repr_helper->GetNumUnmappedExtendable();
 
-      if (repr_helper->GetNumExtendable() < size) {
+      if (repr_helper->GetNumUnmappedExtendable() < size ||
+          num_nec_distinct_cands_ < sum_nec_size_[i]) {
         maximum_matching_->Clear(nec_distinct_cands_, &num_nec_distinct_cands_);
         result = 0;
         goto EXIT;
-      } else if (num_nec_distinct_cands_ < sum_nec_size_[i]) {
-        maximum_matching_->Clear(nec_distinct_cands_, &num_nec_distinct_cands_);
-        result = 0;
-        goto EXIT;
-      } else if (repr_helper->GetNumExtendable() == size) {
+      } else if (repr_helper->GetNumUnmappedExtendable() == size) {
         ReserveVertex(represent, repr_helper);
         result *= Factorial(size);
       }
@@ -214,22 +200,20 @@ uint64_t MatchLeaves::Match(uint64_t limit) {
 
         if (repr_helper->GetMappingState() == RESERVED) continue;
 
-        for (Size k = 0; k < repr_helper->GetNumExtendable(); ++k) {
+        for (Size k = 0; k < repr_helper->GetNumUnmappedExtendable(); ++k) {
           Vertex cand =
               cs_.GetCandidate(represent, repr_helper->GetExtendableIndex(k));
 
           if (backtrack_mapped_query_vtx[cand] != INVALID_VTX) {
-            std::swap(
-                repr_helper->GetExtendableIndices()[k],
-                repr_helper
-                    ->GetExtendableIndices()[repr_helper->GetNumExtendable() -
-                                             1]);
-            repr_helper->GetNumExtendable() -= 1;
+            std::swap(repr_helper->GetExtendableIndices()[k],
+                      repr_helper->GetExtendableIndices()
+                          [repr_helper->GetNumUnmappedExtendable() - 1]);
+            repr_helper->GetNumUnmappedExtendable() -= 1;
             k -= 1;
           }
         }
 
-        if (repr_helper->GetNumExtendable() == size) {
+        if (repr_helper->GetNumUnmappedExtendable() == size) {
           ReserveVertex(represent, repr_helper);
           nec_cand_size_reduced = true;
           result *= Factorial(size);
@@ -250,10 +234,10 @@ uint64_t MatchLeaves::Match(uint64_t limit) {
         continue;
       }
 
-      num_remaining_cands_[j] = repr_helper->GetNumExtendable();
+      num_remaining_cands_[j] = repr_helper->GetNumUnmappedExtendable();
       num_remaining_nec_vertices_[j] = size;
 
-      for (Size k = 0; k < repr_helper->GetNumExtendable(); ++k) {
+      for (Size k = 0; k < repr_helper->GetNumUnmappedExtendable(); ++k) {
         Vertex cand =
             cs_.GetCandidate(represent, repr_helper->GetExtendableIndex(k));
 
@@ -342,7 +326,7 @@ uint64_t MatchLeaves::Combine() {
       Vertex represent = query_.GetNECElement(j).represent;
       BacktrackHelper *repr_helper = backtrack_helpers_ + represent;
 
-      for (Size k = 0; k < repr_helper->GetNumExtendable(); ++k) {
+      for (Size k = 0; k < repr_helper->GetNumUnmappedExtendable(); ++k) {
         Vertex cand =
             cs_.GetCandidate(represent, repr_helper->GetExtendableIndex(k));
 
@@ -366,7 +350,7 @@ uint64_t MatchLeaves::Combine() {
       Vertex represent = query_.GetNECElement(j).represent;
       BacktrackHelper *repr_helper = backtrack_helpers_ + represent;
 
-      for (Size k = 0; k < repr_helper->GetNumExtendable(); ++k) {
+      for (Size k = 0; k < repr_helper->GetNumUnmappedExtendable(); ++k) {
         Vertex cand =
             cs_.GetCandidate(represent, repr_helper->GetExtendableIndex(k));
 
@@ -398,7 +382,8 @@ uint64_t MatchLeaves::Combine() {
 void MatchLeaves::ReserveVertex(Vertex represent,
                                 BacktrackHelper *repr_helper) {
   repr_helper->GetMappingState() = RESERVED;
-  for (Size k = 0; k < repr_helper->GetNumExtendable(); ++k) {
+  reserved_query_vtx_.push_back(represent);
+  for (Size k = 0; k < repr_helper->GetNumUnmappedExtendable(); ++k) {
     Vertex cand =
         cs_.GetCandidate(represent, repr_helper->GetExtendableIndex(k));
 
@@ -414,19 +399,11 @@ void MatchLeaves::ClearMemoryForBacktrack() {
     backtrack_mapped_query_vtx[cand] = INVALID_VTX;
   }
 
-  for (Size i = 0; i < query_.GetNumNECLabel(); ++i) {
-    for (Size j = query_.GetNECStartOffset(i); j < query_.GetNECEndOffset(i);
-         ++j) {
-      Vertex represent = query_.GetNECElement(j).represent;
-      BacktrackHelper *repr_helper = backtrack_helpers_ + represent;
-
-      if (repr_helper->GetNumMappedNeighbors() > 0) {
-        repr_helper->GetMappingState() = UNMAPPED;
-        repr_helper->RemoveMapping();
-      } else {
-        return;
-      }
-    }
+  while (!reserved_query_vtx_.empty()) {
+    Vertex represent = reserved_query_vtx_.back();
+    reserved_query_vtx_.pop_back();
+    BacktrackHelper *repr_helper = backtrack_helpers_ + represent;
+    repr_helper->GetMappingState() = UNMAPPED;
   }
 }
 }  // namespace daf

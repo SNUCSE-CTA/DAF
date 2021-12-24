@@ -161,7 +161,7 @@ inline bool MaximumMatching::BFS() {
       Vertex represent = query_.GetNECElement(j).represent;
       BacktrackHelper *helper = backtrack_helpers_ + represent;
 
-      for (Size k = 0; k < helper->GetNumExtendable(); k++) {
+      for (Size k = 0; k < helper->GetNumUnmappedExtendable(); k++) {
         Vertex cand =
             cs_.GetCandidate(represent, helper->GetExtendableIndex(k));
         Size v = cand_to_v[cand];
@@ -183,7 +183,7 @@ inline bool MaximumMatching::DFS(Size u) {
     Vertex represent = query_.GetNECElement(j).represent;
     BacktrackHelper *helper = backtrack_helpers_ + represent;
 
-    for (Size k = 0; k < helper->GetNumExtendable(); k++) {
+    for (Size k = 0; k < helper->GetNumUnmappedExtendable(); k++) {
       Vertex cand = cs_.GetCandidate(represent, helper->GetExtendableIndex(k));
       Size v = cand_to_v[cand];
       if (dist[pair_V[v]] == dist[u] + 1) {
