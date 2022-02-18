@@ -35,7 +35,7 @@ class CandidateSpace {
 
   Size *candidate_set_size_;
   Vertex **candidate_set_;
-  Size **candidate_offsets_;
+  Size ***candidate_offsets_;
   Vertex *linear_cs_adj_list_;
 
   QueryDegree *num_visit_cs_;
@@ -66,12 +66,12 @@ inline Vertex CandidateSpace::GetCandidate(Vertex u, Size v_idx) const {
 
 inline Size CandidateSpace::GetCandidateStartOffset(Vertex u, Size u_adj_idx,
                                                     Size v_idx) const {
-  return candidate_offsets_[u * query_.GetMaxDegree() + u_adj_idx][v_idx];
+  return candidate_offsets_[u][u_adj_idx][v_idx];
 }
 
 inline Size CandidateSpace::GetCandidateEndOffset(Vertex u, Size u_adj_idx,
                                                   Size v_idx) const {
-  return candidate_offsets_[u * query_.GetMaxDegree() + u_adj_idx][v_idx + 1];
+  return candidate_offsets_[u][u_adj_idx][v_idx + 1];
 }
 
 inline Size CandidateSpace::GetCandidateIndex(Size idx) const {
