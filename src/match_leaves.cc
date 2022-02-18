@@ -217,6 +217,7 @@ uint64_t MatchLeaves::Match(uint64_t limit) {
           ReserveVertex(represent, repr_helper);
           nec_cand_size_reduced = true;
           result *= Factorial(size);
+          if (result >= limit) goto EXIT;
         }
       }
     } while (nec_cand_size_reduced);
@@ -249,7 +250,7 @@ uint64_t MatchLeaves::Match(uint64_t limit) {
       }
     }
 
-    result *= Combine();
+    result *= Combine(limit / result + (limit % result == 0 ? 0 : 1));
 
     for (Size k = 0; k < num_nec_distinct_cands_; ++k) {
       Vertex cand = nec_distinct_cands_[k];
@@ -268,7 +269,7 @@ EXIT:
   return result;
 }
 
-uint64_t MatchLeaves::Combine() {
+uint64_t MatchLeaves::Combine(uint64_t limit) {
   uint64_t result = 0;
 
   Size max_cand_idx = INVALID_SZ;
@@ -343,8 +344,13 @@ uint64_t MatchLeaves::Combine() {
       }
     }
 
-    uint64_t res = Combine();
-    result += (num_remaining_nec_vertices_[j] + 1) * res;
+    Size cartesian = num_remaining_nec_vertices_[j] + 1;
+    uint64_t res = Combine((limit - result) / cartesian +
+                           ((limit - result) % cartesian == 0 ? 0 : 1));
+    result += cartesian * res;
+    if (result >= limit) {
+      return result;
+    }
 
     if (num_remaining_nec_vertices_[j] == 0) {
       Vertex represent = query_.GetNECElement(j).represent;
@@ -365,8 +371,10 @@ uint64_t MatchLeaves::Combine() {
     num_remaining_nec_vertices_[j] += 1;
   }
 
-  uint64_t res = Combine();
-  result += res;
+  result += Combine(limit - result);
+  if (result >= limit) {
+    return result;
+  }
 
   for (Size j : cand_to_nec_idx_[max_cand]) {
     num_remaining_cands_[j] += 1;

@@ -51,7 +51,7 @@ class MatchLeaves {
 
   Size cur_label_idx;
 
-  uint64_t Combine();
+  uint64_t Combine(uint64_t limit);
 
   void ReserveVertex(Vertex represent, BacktrackHelper *repr_helper);
 
